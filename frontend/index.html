@@ -1,0 +1,4666 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OceanGuard AI - Waste Prediction & Cleanup Optimizer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --ocean-deep: #f2f5f9;
+    --ocean-mid: #e8edf4;
+    --ocean-surface: #d7e2ee;
+    --ocean-light: #c5d2e7;
+    --cyan-bright: #7fd7ff;
+    --cyan-dim: #9acff8;
+    --cyan-glow: rgba(127, 215, 255, 0.16);
+    --green-safe: #a8e7c1;
+    --yellow-warn: #ffe4a3;
+    --red-danger: #ff9eb9;
+    --orange-med: #ffb77f;
+    --white: #2b3a52;
+    --muted: #5d7089;
+    --border: rgba(127, 215, 255, 0.24);
+    --card-bg: rgba(255, 255, 255, 0.88);
+    --surface: rgba(255, 255, 255, 0.98);
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    background: radial-gradient(circle at 22% 18%, rgba(127,215,255,0.25), transparent 22%),
+                radial-gradient(circle at 85% 12%, rgba(255,159,185,0.18), transparent 18%),
+                linear-gradient(180deg, #f7fafc 0%, #edf2f8 42%, #e0e8f1 100%);
+    color: var(--white);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Enhanced animated ocean background */
+  .ocean-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: 
+      radial-gradient(ellipse at 20% 50%, rgba(159, 220, 255, 0.24) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, rgba(255, 178, 214, 0.22) 0%, transparent 48%),
+      radial-gradient(ellipse at 50% 80%, rgba(207, 236, 255, 0.18) 0%, transparent 72%),
+      linear-gradient(180deg, #f8fafc 0%, #eef2f7 40%, #e6ecf4 100%);
+    overflow: hidden;
+  }
+
+  .wave {
+    position: absolute;
+    bottom: 0;
+    width: 200%;
+    height: 320px;
+    background: rgba(174, 226, 255, 0.22);
+    border-radius: 42%;
+    animation: wave linear infinite;
+  }
+  .wave:nth-child(1) { animation-duration: 8s; opacity: 0.4; }
+  .wave:nth-child(2) { animation-duration: 12s; opacity: 0.2; bottom: -40px; }
+  .wave:nth-child(3) { animation-duration: 16s; opacity: 0.15; bottom: -80px; }
+
+  @keyframes wave {
+    0% { transform: translateX(-50%) rotate(0deg); }
+    100% { transform: translateX(0%) rotate(360deg); }
+  }
+
+  /* Enhanced grid lines */
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: 
+      linear-gradient(rgba(127,215,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,159,185,0.06) 1px, transparent 1px);
+    background-size: 64px 64px;
+    pointer-events: none;
+    animation: grid-move 20s linear infinite;
+  }
+
+  @keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+  }
+
+  /* Main layout */
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* Enhanced Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px 20px;
+    border-bottom: 1px solid rgba(127,215,255,0.28);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(22px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 16px 35px rgba(91, 110, 141, 0.14);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #0099cc, #00d4ff);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 0 30px rgba(0,212,255,0.4);
+    animation: logo-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes logo-glow {
+    0%, 100% { box-shadow: 0 0 30px rgba(0,212,255,0.4); }
+    50% { box-shadow: 0 0 40px rgba(0,212,255,0.6); }
+  }
+
+  .logo-text h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cyan-bright);
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .logo-text p {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .stat-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 16px;
+    background: rgba(0,212,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+
+  .stat-pill:hover {
+    background: rgba(0,212,255,0.1);
+    transform: translateY(-2px);
+  }
+
+  .stat-pill .val {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cyan-bright);
+    font-family: var(--mono);
+  }
+
+  .stat-pill .lbl {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--cyan-bright);
+    font-family: var(--mono);
+    border: 1px solid rgba(127,215,255,0.45);
+    padding: 6px 12px;
+    border-radius: 24px;
+    background: rgba(127,215,255,0.12);
+    animation: live-pulse 2s ease-in-out infinite;
+  }
+
+  .profile-cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(127,215,255,0.24);
+    background: rgba(255,255,255,0.88);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .profile-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+  }
+
+  .profile-cta span {
+    font-size: 18px;
+    color: #1f334d;
+  }
+
+  .profile-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    min-width: 180px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.98);
+    border: 1px solid rgba(127,215,255,0.22);
+    box-shadow: 0 24px 80px rgba(18,50,86,0.12);
+    overflow: hidden;
+    z-index: 200;
+    display: none;
+  }
+
+  .profile-menu.active {
+    display: block;
+  }
+
+  .profile-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    gap: 10px;
+    font-size: 14px;
+    color: #24354d;
+    cursor: pointer;
+    transition: background 0.18s ease;
+  }
+
+  .profile-menu-item:hover {
+    background: rgba(0,212,255,0.08);
+  }
+
+  .profile-menu-separator {
+    height: 1px;
+    background: rgba(127,215,255,0.18);
+    margin: 0 12px;
+  }
+
+  @keyframes live-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(127,215,255,0.18); }
+    50% { box-shadow: 0 0 20px rgba(127,215,255,0.24); }
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--cyan-bright);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+  }
+
+  /* Enhanced Navigation */
+  .nav {
+    display: flex;
+    gap: 8px;
+    padding: 18px 32px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(127,215,255,0.18);
+    border-radius: 18px;
+    overflow-x: auto;
+    backdrop-filter: blur(18px);
+  }
+
+  .nav-btn {
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(127,215,255,0.2);
+    border-radius: 14px;
+    color: #41546b;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+
+  .nav-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,212,255,0.05));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .nav-btn:hover {
+    color: #2b3a52;
+    background: rgba(127,215,255,0.24);
+    border-color: rgba(127,215,255,0.28);
+    transform: translateY(-1px);
+  }
+
+  .nav-btn:hover::before {
+    opacity: 1;
+  }
+
+  .nav-btn.active {
+    color: #2b3a52;
+    background: linear-gradient(135deg, rgba(127,215,255,0.28), rgba(255, 185, 220, 0.25));
+    border-color: rgba(127,215,255,0.45);
+    box-shadow: 0 8px 22px rgba(127,215,255,0.18);
+  }
+
+  .nav-icon { font-size: 16px; }
+
+  /* Main content */
+  .main {
+    padding: 32px;
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .hidden { display: none !important; }
+
+  .auth-page {
+    min-height: calc(100vh - 160px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 460px;
+    padding: 36px 34px;
+    border-radius: 28px;
+    background: rgba(255,255,255,0.94);
+    border: 1px solid rgba(127,215,255,0.24);
+    box-shadow: 0 24px 80px rgba(18,50,86,0.12);
+    color: #26374d;
+  }
+
+  .auth-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .auth-card .section-title {
+    color: #0f2540;
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  .auth-card .section-sub {
+    color: #586b8a;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .auth-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(127,215,255,0.18);
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(248,252,255,0.9);
+  }
+
+  .auth-tab {
+    flex: 1;
+    padding: 14px 16px;
+    border: none;
+    background: transparent;
+    color: #5f738f;
+    font-weight: 700;
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .auth-tab.active {
+    background: linear-gradient(135deg, rgba(127,215,255,0.35), rgba(255, 185, 220, 0.22));
+    color: #1b324f;
+    box-shadow: inset 0 -4px 0 rgba(0,212,255,0.18);
+  }
+
+  .auth-form-wrapper {
+    display: grid;
+  }
+
+  .auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .auth-field label {
+    color: #4d637d;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .auth-field input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(127,215,255,0.35);
+    background: rgba(244,249,255,0.96);
+    color: #1f334d;
+    font-family: var(--mono);
+    font-size: 14px;
+    outline: none;
+  }
+
+  .auth-field input:focus {
+    border-color: rgba(0,170,255,0.6);
+    box-shadow: 0 0 0 4px rgba(0,170,255,0.08);
+  }
+
+  .auth-action {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  /* Enhanced Cards */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid rgba(127,215,255,0.16);
+    border-radius: 22px;
+    padding: 26px;
+    backdrop-filter: blur(28px);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(91, 110, 141, 0.12);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(127,215,255,0.5), transparent);
+    opacity: 0.7;
+  }
+
+  @keyframes scan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #5c6f8a;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Enhanced Grid layouts */
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .grid-main {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  /* Enhanced Metric cards */
+  .metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+
+  .metric-card .metric-val {
+    font-size: 32px;
+    font-weight: 800;
+    font-family: var(--mono);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .metric-card .metric-lbl {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .metric-card .metric-delta {
+    font-size: 11px;
+    font-family: var(--mono);
+    margin-top: 8px;
+  }
+
+  .metric-card.cyan .metric-val { color: var(--cyan-bright); }
+  .metric-card.green .metric-val { color: var(--green-safe); }
+  .metric-card.red .metric-val { color: var(--red-danger); }
+  .metric-card.orange .metric-val { color: var(--orange-med); }
+
+  .metric-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    border-radius: 0 4px 0 0;
+    background: currentColor;
+    opacity: 0.4;
+  }
+
+  /* Enhanced Ocean map */
+  .ocean-map {
+    position: relative;
+    background: #040d1e;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  /* Map point popup */
+  #map-popup {
+    position: absolute;
+    display: none;
+    min-width: 220px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+    padding: 16px 18px 14px;
+    z-index: 999;
+    pointer-events: auto;
+    font-family: var(--font);
+  }
+  #map-popup.visible { display: block; }
+  #map-popup-close {
+    position: absolute;
+    top: 10px; right: 13px;
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+  }
+  #map-popup-close:hover { color: #333; }
+  #map-popup-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 8px;
+    padding-right: 18px;
+  }
+  #map-popup-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  #map-popup-badge.high   { background: #fff3e8; color: #d4700a; }
+  #map-popup-badge.medium { background: #fffbe6; color: #b08800; }
+  #map-popup-badge.low    { background: #edfff5; color: #1a8a50; }
+  #map-popup-badge .dot   { width: 8px; height: 8px; border-radius: 50%; }
+  #map-popup-badge.high   .dot { background: #e87f2a; }
+  #map-popup-badge.medium .dot { background: #c9a900; }
+  #map-popup-badge.low    .dot { background: #22a864; }
+  #map-popup-body {
+    font-size: 12.5px;
+    color: #444;
+    line-height: 1.9;
+  }
+  #map-popup-body strong { color: #111; font-weight: 600; }
+
+  .map-canvas {
+    width: 100%;
+    display: block;
+  }
+
+  #perfChart,
+  #driftCanvas {
+    width: 100%;
+    max-height: 340px;
+  }
+
+  #trajectoryChart {
+    width: 100%;
+    max-height: calc(90px + 6cm);
+    height: calc(90px + 6cm);
+  }
+
+  .map-controls {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .map-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.86);
+    border: 1px solid rgba(127,215,255,0.28);
+    border-radius: 12px;
+    color: #41546b;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+  }
+
+  .map-btn:hover {
+    color: #2b3a52;
+    border-color: rgba(127,215,255,0.45);
+    transform: scale(1.1);
+  }
+
+  .map-legend {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(127,215,255,0.22);
+    border-radius: 14px;
+    padding: 12px 16px;
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .map-legend-title {
+    font-size: 11px;
+    color: #5d7089;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #2b3a52;
+  }
+
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--white);
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  /* Enhanced Risk zones */
+  .risk-zone {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .risk-zone:hover { 
+    transform: translateX(4px); 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .risk-zone.high {
+    background: rgba(255,51,102,0.1);
+    border-color: rgba(255,51,102,0.3);
+  }
+
+  .risk-zone.medium {
+    background: rgba(255,214,0,0.08);
+    border-color: rgba(255,214,0,0.25);
+  }
+
+  .risk-zone.low {
+    background: rgba(0,255,136,0.06);
+    border-color: rgba(0,255,136,0.2);
+  }
+
+  .risk-name {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .risk-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .risk-tag.high { background: rgba(255,51,102,0.2); color: var(--red-danger); }
+  .risk-tag.medium { background: rgba(255,214,0,0.15); color: var(--yellow-warn); }
+  .risk-tag.low { background: rgba(0,255,136,0.1); color: var(--green-safe); }
+
+  .risk-meta {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-top: 4px;
+  }
+
+  .risk-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0.08;
+  }
+
+  /* Enhanced Alerts */
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    transition: all 0.3s;
+  }
+
+  .alert:hover {
+    transform: translateX(2px);
+  }
+
+  .alert.danger {
+    background: rgba(255,51,102,0.1);
+    border: 1px solid rgba(255,51,102,0.3);
+    color: #ff6688;
+  }
+
+  .alert.warn {
+    background: rgba(255,214,0,0.08);
+    border: 1px solid rgba(255,214,0,0.25);
+    color: #ffd600;
+  }
+
+  .alert.info {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.25);
+    color: var(--cyan-bright);
+  }
+
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .alert-title { font-weight: 700; margin-bottom: 4px; }
+  .alert-body { opacity: 0.8; }
+
+  /* Enhanced Buttons */
+  .btn {
+    padding: 12px 24px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .btn:hover::before {
+    opacity: 1;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #96d9ff, #f7c4ff);
+    color: #2b3a52;
+    box-shadow: 0 10px 28px rgba(150, 214, 255, 0.2);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgba(150, 214, 255, 0.28);
+  }
+
+  .btn-outline {
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(127,215,255,0.24);
+    color: #41546b;
+  }
+
+  .btn-outline:hover {
+    border-color: rgba(127,215,255,0.45);
+    color: #2b3a52;
+    background: rgba(127,215,255,0.18);
+  }
+
+  /* Section header */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+  }
+
+  .section-sub {
+    font-size: 13px;
+    color: #53647f;
+    line-height: 1.55;
+  }
+
+  /* Data source indicators */
+  .data-source {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(127,215,255,0.24);
+    font-size: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .data-source:hover {
+    background: rgba(10,25,52,0.8);
+    transform: translateX(2px);
+  }
+
+  .source-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .source-name { color: #2b3a52; font-weight: 700; flex: 1; }
+  .source-val { color: #5e9dd4; font-family: var(--mono); }
+  .source-time { color: #5d7089; font-family: var(--mono); font-size: 10px; }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -26px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 3px solid;
+  }
+
+  .timeline-item.done .timeline-dot { background: var(--green-safe); border-color: var(--green-safe); }
+  .timeline-item.active .timeline-dot {
+    background: var(--cyan-bright);
+    border-color: var(--cyan-bright);
+    box-shadow: 0 0 12px rgba(0,212,255,0.6);
+    animation: pulse 1.5s infinite;
+  }
+  .timeline-item.pending .timeline-dot { background: transparent; border-color: var(--muted); }
+
+  .timeline-time {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-bottom: 4px;
+  }
+
+  .timeline-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .timeline-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 6px;
+    background: rgba(0,212,255,0.1);
+    border-radius: 3px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+    position: relative;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: progress-shine 2s linear infinite;
+  }
+
+  @keyframes progress-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .grid-4 { grid-template-columns: repeat(3, 1fr); }
+    .grid-main { grid-template-columns: 1fr 320px; }
+  }
+
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .grid-main { grid-template-columns: 1fr; }
+    .header-stats { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    .main { padding: 20px; }
+    .header { padding: 16px 20px; }
+    .nav { padding: 12px 20px; }
+    .section-title { font-size: 20px; }
+  }
+
+  /* Cleanup Routes view */
+  .route-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 1100px) { .route-grid { grid-template-columns: 1fr; } }
+
+  .route-card {
+    border: 1px solid rgba(95, 133, 172, 0.18);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: rgba(12, 44, 70, 0.82);
+  }
+  .route-card:last-child { margin-bottom: 0; }
+  .route-card:hover { background: rgba(12, 58, 96, 0.95); transform: translateX(3px); }
+  .route-card.active {
+    border-color: rgba(81, 210, 255, 0.45);
+    background: rgba(8, 89, 140, 0.96);
+    box-shadow: 0 4px 24px rgba(0, 147, 255, 0.14);
+  }
+  .route-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .route-id {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--white);
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+  }
+  .priority-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .priority-badge.p1 { background: rgba(255,51,102,0.2); color: var(--red-danger); border: 1px solid rgba(255,51,102,0.3); }
+  .priority-badge.p2 { background: rgba(255,214,0,0.15); color: var(--yellow-warn); border: 1px solid rgba(255,214,0,0.3); }
+  .priority-badge.p3 { background: rgba(0,255,136,0.1); color: var(--green-safe); border: 1px solid rgba(0,255,136,0.25); }
+  .route-stops {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .stop-pill {
+    font-size: 11px;
+    font-family: var(--mono);
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #d7e8ff;
+    white-space: nowrap;
+  }
+  .stop-arrow { color: #a9c4e4; font-size: 10px; }
+  .route-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+  }
+  .route-stat-item { }
+  .route-stat-label { font-size: 10px; color: #9eb8d5; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+  .route-stat-val { font-size: 14px; font-weight: 700; color: #f4fbff; font-family: var(--mono); }
+
+  /* Drift Prediction view */
+  .pred-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 1000px) {
+    .pred-grid { grid-template-columns: 1fr; }
+  }
+  .pred-param { margin-bottom: 18px; }
+  .pred-param-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .pred-param-label { font-size: 13px; color: var(--muted); }
+  .pred-param-val { font-size: 13px; font-family: var(--mono); font-weight: 700; color: var(--cyan-bright); }
+  .pred-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    background: rgba(0,212,255,0.15);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  .pred-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--cyan-bright);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,212,255,0.6);
+    transition: transform 0.15s;
+  }
+  .pred-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .pred-slider::-moz-range-thumb {
+    width: 16px; height: 16px;
+    background: var(--cyan-bright);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+  .drift-vec {
+    font-size: 12px;
+    font-family: var(--mono);
+    margin-bottom: 7px;
+  }
+  .pred-output-box {
+    background: rgba(0,212,255,0.06);
+    border: 1px solid rgba(0,212,255,0.18);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .pred-output-box.red {
+    background: rgba(255,51,102,0.06);
+    border-color: rgba(255,51,102,0.18);
+  }
+
+  /* Map layer toggle buttons */
+  .time-btn {
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .time-btn:hover {
+    color: var(--white);
+    border-color: rgba(0,212,255,0.4);
+    background: rgba(0,212,255,0.05);
+  }
+
+  .time-btn.active {
+    color: var(--cyan-bright);
+    border-color: rgba(0,212,255,0.5);
+    background: rgba(0,212,255,0.12);
+  }
+
+  /* Loading animation */
+  .loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,212,255,0.3);
+    border-radius: 50%;
+    border-top-color: var(--cyan-bright);
+    animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Connection status */
+  .connection-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: var(--mono);
+    z-index: 1000;
+    transition: all 0.3s;
+  }
+
+  .connection-status.connected {
+    background: rgba(127,215,255,0.14);
+    border: 1px solid rgba(127,215,255,0.3);
+    color: var(--cyan-bright);
+  }
+
+  .connection-status.disconnected {
+    background: rgba(255,51,102,0.1);
+    border: 1px solid rgba(255,51,102,0.3);
+    color: var(--red-danger);
+  }
+</style>
+</head>
+<body>
+
+<div class="ocean-bg">
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div class="wave"></div>
+</div>
+<div class="grid-overlay"></div>
+
+<div class="connection-status" id="connectionStatus">
+  <div class="live-dot"></div>
+  Connecting to server...
+</div>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🌊</div>
+      <div class="logo-text">
+        <h1>OceanGuard AI</h1>
+        <p>Waste Prediction & Cleanup Optimizer v3.0</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-pill">
+        <div class="val" id="h-zones">47</div>
+        <div class="lbl">Active Zones</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val" id="h-teams">12</div>
+        <div class="lbl">Teams Deployed</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val" id="h-acc">94.2%</div>
+        <div class="lbl">Model Accuracy</div>
+      </div>
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+      <div class="profile-cta" onclick="toggleProfileMenu(event)">
+        <span id="profileInitial">👤</span>
+        <div class="profile-menu" id="profileMenu">
+          <div class="profile-menu-item" onclick="viewProfile()">
+            <span>View Profile</span>
+            <span>➡</span>
+          </div>
+          <div class="profile-menu-separator"></div>
+          <div class="profile-menu-item" onclick="logout()">
+            <span>Logout</span>
+            <span>⏻</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <button class="nav-btn active" onclick="switchView('dashboard')" data-view="dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+    </button>
+    <button class="nav-btn" onclick="switchView('prediction')" data-view="prediction">
+      <span class="nav-icon">🔮</span> Drift Prediction
+    </button>
+    <button class="nav-btn" onclick="switchView('routes')" data-view="routes">
+      <span class="nav-icon">🛣️</span> Cleanup Routes
+    </button>
+    <button class="nav-btn" onclick="switchView('operations')" data-view="operations">
+      <span class="nav-icon">🚢</span> Operations
+    </button>
+    <button class="nav-btn" onclick="switchView('aimodel')" data-view="aimodel">
+      <span class="nav-icon">🤖</span> AI Model
+    </button>
+    <button class="nav-btn" onclick="switchView('datasources')" data-view="datasources">
+      <span class="nav-icon">📡</span> Data Sources
+    </button>
+  </nav>
+
+  <div class="main">
+
+    <!-- ===== LOGIN VIEW ===== -->
+    <div id="view-login" class="view active">
+      <div class="auth-page">
+        <div class="auth-card">
+          <div class="auth-header">
+            <div class="logo-icon">🌊</div>
+            <div>
+              <div class="section-title">Ocean Dashboard</div>
+              <div class="section-sub" id="authSubtitle">Sign in to access ocean waste monitoring and analysis.</div>
+            </div>
+          </div>
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+            <button type="button" class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
+          </div>
+          <div class="auth-form-wrapper">
+            <form id="loginForm" onsubmit="handleLogin(event)">
+              <div class="auth-field">
+                <label for="loginUsername">Username</label>
+                <input id="loginUsername" type="text" placeholder="Enter username" required />
+              </div>
+              <div class="auth-field">
+                <label for="loginPassword">Password</label>
+                <input id="loginPassword" type="password" placeholder="Enter password" required />
+              </div>
+              <button type="submit" class="btn btn-primary auth-action">Login</button>
+            </form>
+            <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+              <div class="auth-field">
+                <label for="registerUsername">Username</label>
+                <input id="registerUsername" type="text" placeholder="Choose a username" required />
+              </div>
+              <div class="auth-field">
+                <label for="registerEmail">Email</label>
+                <input id="registerEmail" type="email" placeholder="Enter email address" required />
+              </div>
+              <div class="auth-field">
+                <label for="registerPassword">Password</label>
+                <input id="registerPassword" type="password" placeholder="Create a password" required />
+              </div>
+              <div class="auth-field">
+                <label for="registerConfirm">Confirm Password</label>
+                <input id="registerConfirm" type="password" placeholder="Confirm password" required />
+              </div>
+              <div class="auth-field">
+                <label for="registerRole">Role</label>
+                <select id="registerRole" style="padding:14px 16px; border-radius:16px; border:1px solid rgba(127,215,255,0.35); background:rgba(244,249,255,0.96); color:#1f334d; font-family:var(--mono); font-size:14px;">
+                  <option>Analyst</option>
+                  <option>Operator</option>
+                  <option>Supervisor</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary auth-action">Create Account</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD VIEW ===== -->
+    <div id="view-dashboard" class="view">
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Mission Control</div>
+          <div class="section-sub">Real-time ocean waste monitoring & AI predictions — Indian Ocean Region</div>
+        </div>
+        <button class="btn btn-primary" onclick="refreshData(event)">🔄 Refresh Data</button>
+      </div>
+
+      <!-- Metric Row -->
+      <div class="grid-4">
+        <div class="metric-card cyan">
+          <div class="metric-val" id="m-waste">3,847</div>
+          <div class="metric-lbl">Tons Waste Detected</div>
+          <div class="metric-delta" style="color: var(--red-danger)">↑ +12% from last week</div>
+          <div class="metric-bar" style="width: 72%; color: var(--cyan-bright);"></div>
+        </div>
+        <div class="metric-card red">
+          <div class="metric-val" id="m-risk">8</div>
+          <div class="metric-lbl">High Risk Zones</div>
+          <div class="metric-delta" style="color: var(--red-danger)">⚠ Immediate action needed</div>
+          <div class="metric-bar" style="width: 40%; color: var(--red-danger);"></div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-val" id="m-cleanups">23</div>
+          <div class="metric-lbl">Cleanups Completed</div>
+          <div class="metric-delta" style="color: var(--green-safe)">↑ +5 this week</div>
+          <div class="metric-bar" style="width: 58%; color: var(--green-safe);"></div>
+        </div>
+        <div class="metric-card orange">
+          <div class="metric-val" id="m-window">38h</div>
+          <div class="metric-lbl">Avg Prediction Window</div>
+          <div class="metric-delta" style="color: var(--orange-med)">Next update in 2h 14m</div>
+          <div class="metric-bar" style="width: 85%; color: var(--orange-med);"></div>
+        </div>
+      </div>
+
+      <!-- Main grid -->
+      <div class="grid-main">
+
+        <!-- Ocean Map -->
+        <div class="card" style="padding: 0; position: relative;">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+            <div class="card-title" style="margin: 0">🗺 Live Ocean Monitor</div>
+            <div style="display: flex; gap: 8px;">
+              <div class="time-btn active" id="layer-waste" onclick="setMapLayer('waste', this)">Waste</div>
+              <div class="time-btn" id="layer-current" onclick="setMapLayer('current', this)">Currents</div>
+              <div class="time-btn" id="layer-risk" onclick="setMapLayer('risk', this)">Risk</div>
+            </div>
+          </div>
+          <canvas id="oceanMap" class="map-canvas" height="300" style="cursor: crosshair;" onclick="handleMapClick(event)"></canvas>
+          <!-- Map point popup -->
+          <div id="map-popup">
+            <span id="map-popup-close" onclick="document.getElementById('map-popup').classList.remove('visible')">✕</span>
+            <div id="map-popup-title"></div>
+            <div id="map-popup-badge"><span class="dot"></span><span id="map-popup-tier"></span></div>
+            <div id="map-popup-body"></div>
+          </div>
+          <div class="map-legend">
+            <div class="map-legend-title">Waste Density</div>
+            <div class="legend-row"><div class="legend-dot" style="background:rgba(255,51,102,0.9)"></div> High (&gt;500 tons)</div>
+            <div class="legend-row"><div class="legend-dot" style="background:rgba(255,214,0,0.8)"></div> Medium (100-500 tons)</div>
+            <div class="legend-row"><div class="legend-dot" style="background:rgba(0,255,136,0.7)"></div> Low (&lt;100 tons)</div>
+          </div>
+        </div>
+
+        <!-- Right panel -->
+        <div>
+
+          <!-- Alerts -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-title">⚡ Active Alerts</div>
+            <div id="alerts-container">
+              <div class="alert info">
+                <div class="alert-icon">ℹ️</div>
+                <div>
+                  <div class="alert-title">Waiting for live data...</div>
+                  <div class="alert-body">Real-time feed will populate within a few seconds.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk Zones -->
+          <div class="card">
+            <div class="card-title">📍 Risk Zones</div>
+            <div id="risk-zones-container">
+              <div class="risk-zone info">
+                <div class="risk-fill" style="background: var(--cyan-bright); width: 65%;"></div>
+                <div>
+                  <div class="risk-name">Live risk zones are being loaded</div>
+                  <div class="risk-meta">Data source: MongoDB + Open-Meteo</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row -->
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">🌡 Environmental Conditions</div>
+          <div id="environmental-container">
+            <div class="data-source">
+              <div class="source-dot" style="background: var(--cyan-bright);"></div>
+              <div class="source-name">Ocean Current</div>
+              <div class="source-val" id="env-current">2.4 knots NE</div>
+            </div>
+            <div class="data-source">
+              <div class="source-dot" style="background: var(--green-safe);"></div>
+              <div class="source-name">Wind Speed</div>
+              <div class="source-val" id="env-wind">18 km/h ESE</div>
+            </div>
+            <div class="data-source">
+              <div class="source-dot" style="background: var(--yellow-warn);"></div>
+              <div class="source-name">Tide State</div>
+              <div class="source-val" id="env-tide">Incoming +1.2m</div>
+            </div>
+            <div class="data-source">
+              <div class="source-dot" style="background: var(--orange-med);"></div>
+              <div class="source-name">Wave Height</div>
+              <div class="source-val" id="env-wave">0.8m moderate</div>
+            </div>
+            <div class="data-source">
+              <div class="source-dot" style="background: #b388ff;"></div>
+              <div class="source-name">Air Quality</div>
+              <div class="source-val" id="env-aqi">Loading…</div>
+            </div>
+            <div class="data-source">
+              <div class="source-dot" style="background: var(--red-danger);"></div>
+              <div class="source-name">Active Storms</div>
+              <div class="source-val" id="storms-count">Loading…</div>
+            </div>
+            <div class="data-source">
+              <div class="source-dot" style="background: var(--green-safe);"></div>
+              <div class="source-name">Waste Reports</div>
+              <div class="source-val" id="waste-reports-count">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⏱ Prediction Timeline</div>
+          <div class="timeline" id="timeline-container">
+            <div class="timeline-item pending">
+              <div class="timeline-dot"></div>
+              <div class="timeline-time">Waiting for live events</div>
+              <div class="timeline-title">Live prediction timeline loading</div>
+              <div class="timeline-desc">Latest waste risk and route updates will appear here.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📈 Weekly Performance</div>
+          <canvas id="perfChart" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other views would go here - keeping it simple for now -->
+    <div id="view-prediction" class="view">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Waste Drift Prediction Engine</div>
+          <div class="section-sub">Vector-based simulation: Waste Movement = Current + Wind + Tide</div>
+        </div>
+        <button class="btn btn-primary" onclick="runPrediction(event)">▶ Run Simulation</button>
+      </div>
+
+      <div class="pred-grid">
+        <!-- Left: Drift canvas -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">🌀</span>
+            <span class="card-title" style="margin: 0;">DRIFT VECTOR SIMULATION</span>
+          </div>
+          <canvas id="driftCanvas" height="340" style="width: 100%; display: block; cursor: crosshair;"></canvas>
+        </div>
+
+        <!-- Right: Parameters + Prediction Output -->
+        <div>
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-title">📐 ENVIRONMENTAL PARAMETERS</div>
+
+            <div class="pred-param">
+              <div class="pred-param-header">
+                <span class="pred-param-label">Ocean Current Speed</span>
+                <span class="pred-param-val" id="p-currentSpeed">2.4 knots</span>
+              </div>
+              <input id="input-currentSpeed" type="range" class="pred-slider" min="0.5" max="8" step="0.1" value="2.4" oninput="updatePredParam('currentSpeed', this.value)">
+            </div>
+
+            <div class="pred-param">
+              <div class="pred-param-header">
+                <span class="pred-param-label">Wind Speed</span>
+                <span class="pred-param-val" id="p-windSpeed">18 km/h</span>
+              </div>
+              <input id="input-windSpeed" type="range" class="pred-slider" min="0" max="60" step="1" value="18" oninput="updatePredParam('windSpeed', this.value)">
+            </div>
+
+            <div class="pred-param">
+              <div class="pred-param-header">
+                <span class="pred-param-label">Tide Amplitude</span>
+                <span class="pred-param-val" id="p-tideAmplitude">1.2 m</span>
+              </div>
+              <input id="input-tideAmplitude" type="range" class="pred-slider" min="0.1" max="4" step="0.1" value="1.2" oninput="updatePredParam('tideAmplitude', this.value)">
+            </div>
+
+            <div class="pred-param">
+              <div class="pred-param-header">
+                <span class="pred-param-label">Waste Density Estimate</span>
+                <span class="pred-param-val" id="p-wasteDensity">840 tons</span>
+              </div>
+              <input id="input-wasteDensity" type="range" class="pred-slider" min="50" max="2000" step="10" value="840" oninput="updatePredParam('wasteDensity', this.value)">
+            </div>
+
+            <div class="pred-param" style="margin-bottom: 0;">
+              <div class="pred-param-header">
+                <span class="pred-param-label">Forecast Window</span>
+                <span class="pred-param-val" id="p-forecastWindow">48 hours</span>
+              </div>
+              <input id="input-forecastWindow" type="range" class="pred-slider" min="6" max="72" step="6" value="48" oninput="updatePredParam('forecastWindow', this.value)">
+            </div>
+          </div>
+
+          <!-- Prediction Output -->
+          <div class="card">
+            <div class="card-title">🎯 PREDICTION OUTPUT</div>
+
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 12px; color: var(--muted); margin-bottom: 6px;">Predicted Landing Zone</div>
+              <div style="font-size: 22px; font-weight: 800; color: var(--red-danger);" id="pred-zone">Beach Alpha</div>
+              <div class="pred-coord" style="font-size: 12px; color: var(--muted); font-family: var(--mono);">10.68°N, 79.85°E</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+              <div class="pred-output-box">
+                <div style="font-size: 20px; font-weight: 800; color: var(--cyan-bright); font-family: var(--mono);" id="pred-timeimpact">T+4h</div>
+                <div style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px;">Time to Impact</div>
+              </div>
+              <div class="pred-output-box red">
+                <div style="font-size: 20px; font-weight: 800; color: var(--red-danger); font-family: var(--mono);" id="pred-confidence">94%</div>
+                <div style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px;">Confidence</div>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px;">Drift Vector Components</div>
+              <div class="drift-vec" style="color: var(--cyan-bright);">→ Current: <span id="pred-current-vec">+2.4 kt NE</span></div>
+              <div class="drift-vec" style="color: var(--green-safe);">→ Wind: <span id="pred-wind-vec">+0.72 kt E</span></div>
+              <div class="drift-vec" style="color: var(--yellow-warn);">→ Tide: <span id="pred-tide-vec">+0.30 kt shore</span></div>
+              <div class="drift-vec" style="color: var(--red-danger); font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">Σ Net: <span id="pred-net-vec">3.4 kt · 062°</span></div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="switchView('routes')">→ Generate Cleanup Routes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trajectory Forecast Chart -->
+      <div class="card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+          <div class="card-title" style="margin: 0;">📊 48-HOUR WASTE TRAJECTORY FORECAST</div>
+          <div style="display: flex; gap: 8px;">
+            <button class="time-btn active" onclick="setTrajWindow('+6h', this)">+6h</button>
+            <button class="time-btn" onclick="setTrajWindow('+12h', this)">+12h</button>
+            <button class="time-btn" onclick="setTrajWindow('+24h', this)">+24h</button>
+            <button class="time-btn" onclick="setTrajWindow('+48h', this)">+48h</button>
+          </div>
+        </div>
+        <canvas id="trajectoryChart" height="90"></canvas>
+      </div>
+    </div>
+
+    <div id="view-routes" class="view">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Smart Cleanup Route Optimizer</div>
+          <div class="section-sub">TSP + A* routing — Google Maps for waste collection</div>
+        </div>
+        <button class="btn btn-primary" onclick="reOptimizeRoutes(event)">⚡ Re-Optimize All Routes</button>
+      </div>
+
+      <div class="route-grid">
+        <!-- Left: Route Map Canvas -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 16px;">🗺</span>
+              <span class="card-title" style="margin: 0;">OPTIMIZED ROUTE MAP</span>
+            </div>
+            <span style="font-size: 12px; color: var(--muted); font-family: var(--mono);">A* + TSP Algorithm</span>
+          </div>
+          <canvas id="routeCanvas" height="420" style="width: 100%; display: block; cursor: crosshair; border-radius: 0 0 4px 4px;"></canvas>
+
+          <!-- Bottom stats bar -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid var(--border);">
+            <div style="padding: 16px 20px; border-right: 1px solid var(--border);">
+              <div style="font-size: 28px; font-weight: 800; color: var(--cyan-bright); font-family: var(--mono);" id="r-vessels">6</div>
+              <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px;">Vessels Deployed</div>
+            </div>
+            <div style="padding: 16px 20px; border-right: 1px solid var(--border);">
+              <div style="font-size: 28px; font-weight: 800; color: var(--green-safe); font-family: var(--mono);" id="r-workers">24</div>
+              <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px;">Workers on Duty</div>
+            </div>
+            <div style="padding: 16px 20px;">
+              <div style="font-size: 28px; font-weight: 800; color: var(--orange-med); font-family: var(--mono);" id="r-completion">18h</div>
+              <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px;">Est. Completion</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Route Cards -->
+        <div>
+          <div class="card">
+            <div class="card-title">🛣 OPTIMIZED ROUTES</div>
+            <div id="route-cards-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-operations" class="view">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Field Operations Center</div>
+          <div class="section-sub">Live deployment status for all cleanup teams and vessels</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🚢 Operations Management</div>
+        <div id="operations-content">
+          <div class="operations-summary" id="operations-summary">
+            <div class="op-summary-item">
+              <div class="op-summary-label">Teams</div>
+              <div class="op-summary-value" id="ops-teams">0</div>
+            </div>
+            <div class="op-summary-item">
+              <div class="op-summary-label">Vessels</div>
+              <div class="op-summary-value" id="ops-vessels">0</div>
+            </div>
+            <div class="op-summary-item">
+              <div class="op-summary-label">Recovered Today</div>
+              <div class="op-summary-value" id="ops-recovered">0</div>
+            </div>
+            <div class="op-summary-item">
+              <div class="op-summary-label">Efficiency</div>
+              <div class="op-summary-value" id="ops-efficiency">0%</div>
+            </div>
+          </div>
+          <div style="margin-top: 20px;">
+            <canvas id="operationsChart" height="220"></canvas>
+          </div>
+          <div id="operations-list" style="margin-top: 24px; color: var(--muted); font-size: 13px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-aimodel" class="view">
+      <div class="section-header">
+        <div>
+          <div class="section-title">AI Prediction Model</div>
+          <div class="section-sub">LSTM + vector forecasting powered by live ocean data</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🤖 Model Performance</div>
+        <div id="aimodel-content">
+          <div class="ai-summary" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div class="ai-card">
+              <div class="ai-label">Accuracy</div>
+              <div class="ai-value" id="model-accuracy">0%</div>
+            </div>
+            <div class="ai-card">
+              <div class="ai-label">Forecast Horizon</div>
+              <div class="ai-value" id="model-horizon">0h</div>
+            </div>
+            <div class="ai-card">
+              <div class="ai-label">Last Retrained</div>
+              <div class="ai-value" id="model-lasttrained">n/a</div>
+            </div>
+            <div class="ai-card">
+              <div class="ai-label">Training Data</div>
+              <div class="ai-value" id="model-datapoints">0</div>
+            </div>
+          </div>
+          <canvas id="aimodelChart" height="100" style="height: calc(100px + 8cm); max-height: calc(100px + 8cm); width: 100%;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-datasources" class="view">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Data Sources & Integrations</div>
+          <div class="section-sub">Real-time environmental feeds powering the prediction engine</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📡 Data Integration</div>
+        <div id="datasources-content">
+          <div class="datasource-summary" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div class="ds-card">
+              <div class="ds-label">Feeds Live</div>
+              <div class="ds-value" id="ds-live-count">0</div>
+            </div>
+            <div class="ds-card">
+              <div class="ds-label">Update Frequency</div>
+              <div class="ds-value" id="ds-frequency">—</div>
+            </div>
+            <div class="ds-card">
+              <div class="ds-label">Points / day</div>
+              <div class="ds-value" id="ds-points">0</div>
+            </div>
+          </div>
+          <canvas id="datasourceChart" height="100" style="height: calc(100px + 8cm); max-height: calc(100px + 8cm); width: 100%;"></canvas>
+          <div id="datasource-list" style="margin-top: 24px; color: var(--muted); font-size: 13px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+<script>
+// ==================== STATE ====================
+let currentView = 'login';
+let isAuthenticated = false;
+let loggedInUser = null;
+let mapLayer = 'waste';
+let animFrame;
+let driftAnimFrame;
+let particles = [];
+let time = 0;
+let socket;
+let isConnected = false;
+
+// Live world map state
+let worldMapImage = new Image();
+let worldMapLoaded = false;
+let worldMapTick = 0;
+
+// Routes state
+let routeAnimFrame;
+let selectedRoute = 'LANE-1';   // default to first fallback lane until live data arrives
+let routeVessels = {};
+let routeTime = 0;
+let isReOptimizing = false;
+let ROUTES = [];
+let latestOperationData  = null;
+let latestWasteData      = null;
+let latestDashboardStats = null;
+let latestEnvData        = null;
+
+// Drift prediction state
+let predParams = { currentSpeed: 2.4, windSpeed: 18, tideAmplitude: 1.2, wasteDensity: 840, forecastWindow: 48 };
+let driftParticles = [];
+let driftTime = 0;
+let trajChartInst = null;
+let perfChartInst = null;
+let operationsChartInst = null;
+let aimodelChartInst = null;
+let datasourceChartInst = null;
+let currentTrajWindow = '+6h';
+
+// ==================== SOCKET.IO CONNECTION ====================
+function initializeSocket() {
+  socket = io('http://localhost:5000');
+  
+  socket.on('connect', () => {
+    console.log('Connected to server');
+    isConnected = true;
+    updateConnectionStatus('connected');
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+    isConnected = false;
+    updateConnectionStatus('disconnected');
+  });
+  
+  socket.on('waste-data-update', (data) => {
+    latestWasteData = data;
+    updateDashboardWithNewData(data);
+    updatePredictionPage(data);
+    renderRiskZones(data.predictions || []);
+    renderPredictionTimeline(data.predictions || [], latestOperationData);
+  });
+
+  socket.on('operation-update', (data) => {
+    latestOperationData = data;
+    updateOperationsWithNewData(data);
+    renderPredictionTimeline(latestWasteData?.predictions || [], data);
+  });
+
+  // ---- new dataset events ----
+  socket.on('marine-data-update', (data) => {
+    if (currentView === 'datasources') fetchDataSources();
+    updateMarinePanel(data);
+    // Wave height alert
+    const wh = data.waveHeight;
+    if (wh > 2.0) addAlert({ icon: '🌊', severity: 'danger',  title: `High Seas: ${wh.toFixed(1)}m Waves at ${data.location?.label || 'Offshore'}`, body: `Swell ${data.swellHeight?.toFixed(1) ?? '—'}m · Period ${data.wavePeriod?.toFixed(0) ?? '—'}s · Vessel ops at risk`, maxAgeMs: 10*60*1000 });
+    else if (wh > 1.2) addAlert({ icon: '🌊', severity: 'warning', title: `Moderate Swell: ${wh.toFixed(1)}m at ${data.location?.label || 'Offshore'}`, body: `Wind wave ${data.windWaveHeight?.toFixed(1) ?? '—'}m · Enhanced drift expected`, maxAgeMs: 12*60*1000 });
+  });
+
+  socket.on('air-quality-update', (data) => {
+    updateAirQualityPanel(data);
+    if (currentView === 'datasources') fetchDataSources();
+    if (data.europeanAqi > 60) addAlert({ icon: '💨', severity: data.europeanAqi > 80 ? 'danger' : 'warning', title: `Air Quality ${data.aqiCategory}: AQI ${data.europeanAqi}`, body: `PM10 ${data.pm10?.toFixed(1)} μg/m³ · PM2.5 ${data.pm2_5?.toFixed(1)} μg/m³ · Tamil Nadu coastal zone`, maxAgeMs: 15*60*1000 });
+  });
+
+  socket.on('storms-update', (data) => {
+    if (currentView === 'datasources') fetchDataSources();
+    fetchDashboardStats();
+    if (data?.newCount > 0) addAlert({ icon: '🌀', severity: 'danger', title: `${data.newCount} New Storm Event${data.newCount > 1 ? 's' : ''} Detected`, body: `NASA EONET tracking ${data.total} active storm events in monitored region`, maxAgeMs: 20*60*1000 });
+  });
+
+  socket.on('tidal-update', (data) => {
+    updateTidalPanel(data);
+    if (currentView === 'datasources') fetchDataSources();
+    if (data.currentLevel > 1.4) addAlert({ icon: '🌊', severity: 'warning', title: `High Tide at ${data.location?.name}: ${data.currentLevel}m`, body: `Trend: ${data.trend} · Next high in ${data.nextHighTide?.hoursAway?.toFixed(1) ?? '?'}h · Elevated coastal drift risk`, maxAgeMs: 10*60*1000 });
+  });
+
+  socket.on('waste-reports-update', (data) => {
+    if (currentView === 'datasources') fetchDataSources();
+    if (data?.count > 0) addAlert({ icon: '📍', severity: 'warning', title: `${data.count} New Waste Sighting Report${data.count > 1 ? 's' : ''} Filed`, body: `Crowdsource · drone · vessel · satellite feeds updated`, maxAgeMs: 8*60*1000 });
+  });
+}
+
+function updateConnectionStatus(status) {
+  const statusEl = document.getElementById('connectionStatus');
+  if (status === 'connected') {
+    statusEl.className = 'connection-status connected';
+    statusEl.innerHTML = '<div class="live-dot"></div> Connected to server';
+  } else {
+    statusEl.className = 'connection-status disconnected';
+    statusEl.innerHTML = '<div class="live-dot"></div> Disconnected from server';
+  }
+}
+
+// ==================== API FUNCTIONS ====================
+
+// ---- new dataset fetch functions ----
+async function fetchMarineData() {
+  try {
+    const res  = await fetch('http://localhost:5000/api/marine-data/latest');
+    const docs = await res.json();
+    if (Array.isArray(docs) && docs.length) updateMarinePanel(docs[0]);
+  } catch (e) { console.error('fetchMarineData:', e); }
+}
+
+async function fetchAirQualityData() {
+  try {
+    const res  = await fetch('http://localhost:5000/api/air-quality/latest');
+    const data = await res.json();
+    if (data) updateAirQualityPanel(data);
+  } catch (e) { console.error('fetchAirQualityData:', e); }
+}
+
+async function fetchStorms() {
+  try {
+    const res  = await fetch('http://localhost:5000/api/storms');
+    const data = await res.json();
+    updateStormsPanel(data);
+  } catch (e) { console.error('fetchStorms:', e); }
+}
+
+async function fetchTidalData() {
+  try {
+    const res  = await fetch('http://localhost:5000/api/tidal-data/latest');
+    const docs = await res.json();
+    if (Array.isArray(docs) && docs.length) updateTidalPanel(docs[0]);
+  } catch (e) { console.error('fetchTidalData:', e); }
+}
+
+async function fetchWasteReports() {
+  try {
+    const res  = await fetch('http://localhost:5000/api/waste-reports');
+    const data = await res.json();
+    updateWasteReportsPanel(data);
+  } catch (e) { console.error('fetchWasteReports:', e); }
+}
+
+// ---- panel update helpers for new datasets ----
+function updateMarinePanel(doc) {
+  if (!doc) return;
+  const el = document.getElementById('env-wave');
+  if (el && doc.waveHeight != null) {
+    el.textContent = `${doc.waveHeight.toFixed(2)}m · swell ${(doc.swellHeight || 0).toFixed(2)}m`;
+  }
+  // Update current speed from ocean current if available
+  if (doc.oceanCurrentVelocity != null) {
+    const ce = document.getElementById('env-current');
+    if (ce) ce.textContent = `${(doc.oceanCurrentVelocity * 1.944).toFixed(1)} knots ` +
+      (doc.oceanCurrentDirection != null ? degreesToCardinalFE(doc.oceanCurrentDirection) : '');
+  }
+}
+
+function updateAirQualityPanel(doc) {
+  if (!doc) return;
+  const el = document.getElementById('env-aqi');
+  if (el) el.textContent = `AQI ${doc.europeanAqi ?? '—'} · ${doc.aqiCategory || '—'} · PM10 ${doc.pm10?.toFixed(1) ?? '—'} μg/m³`;
+}
+
+function updateTidalPanel(doc) {
+  if (!doc) return;
+  const el = document.getElementById('env-tide');
+  if (el) {
+    const nh = doc.nextHighTide;
+    const trend = doc.trend || '';
+    el.textContent = `${doc.currentLevel != null ? doc.currentLevel.toFixed(2) : '—'}m ${trend}` +
+      (nh?.hoursAway != null ? ` · next high in ${nh.hoursAway}h` : '');
+  }
+  // Sync prediction slider
+  if (doc.currentLevel != null) {
+    predParams.tideAmplitude = doc.currentLevel;
+    const lbl = document.getElementById('p-tideAmplitude');
+    const inp = document.getElementById('input-tideAmplitude');
+    if (lbl) lbl.textContent = `${doc.currentLevel.toFixed(1)} m`;
+    if (inp) inp.value = doc.currentLevel;
+    recalcPrediction();
+    updateTrajectoryChart();
+  }
+}
+
+function updateStormsPanel(data) {
+  if (!data) return;
+  const el = document.getElementById('storms-count');
+  if (el) el.textContent = `${data.total || 0} active · ${data.inRegion || 0} in region`;
+}
+
+function updateWasteReportsPanel(data) {
+  if (!data) return;
+  const el = document.getElementById('waste-reports-count');
+  if (el) el.textContent = `${data.total || 0} reports`;
+}
+
+// Cardinal direction helper (frontend copy — no server call needed)
+function degreesToCardinalFE(deg) {
+  const d = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return d[Math.round(((deg % 360) + 360) / 22.5) % 16];
+}
+
+async function fetchDashboardStats() {
+  try {
+    const response = await fetch('http://localhost:5000/api/dashboard/stats');
+    const stats = await response.json();
+    latestDashboardStats = stats;
+    updateDashboardStats(stats);
+    // Rebuild alerts with fresh stats context
+    if (latestWasteData) buildAlertsFromLiveData(latestWasteData, stats, latestEnvData);
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+  }
+}
+
+async function fetchEnvironmentalData() {
+  try {
+    const response = await fetch('http://localhost:5000/api/environmental');
+    const data = await response.json();
+    latestEnvData = data;
+    updateEnvironmentalDisplay(data);
+    // Sync prediction sliders from live weather
+    predParams.currentSpeed = parseFloat(data.currentSpeed) || predParams.currentSpeed;
+    predParams.windSpeed    = parseFloat(data.windSpeed)    || predParams.windSpeed;
+    // Use real tidal level if available, otherwise estimated tideHeight
+    predParams.tideAmplitude = data.tidal?.currentLevel
+      ? parseFloat(data.tidal.currentLevel)
+      : (parseFloat(data.tideHeight) || predParams.tideAmplitude);
+    recalcPrediction();
+    updateTrajectoryChart();
+    // Update sub-panels from enriched fields
+    if (data.airQuality) updateAirQualityPanel(data.airQuality);
+    if (data.tidal)      updateTidalPanel(data.tidal);
+    if (data.marine)     updateMarinePanel(data.marine);
+    // Rebuild alerts with fresh env context (wave height, AQI, tidal)
+    if (latestWasteData) buildAlertsFromLiveData(latestWasteData, latestDashboardStats, data);
+  } catch (error) {
+    console.error('Error fetching environmental data:', error);
+  }
+}
+
+async function fetchWasteLatest() {
+  try {
+    const response = await fetch('http://localhost:5000/api/waste-data/latest');
+    const data = await response.json();
+    latestWasteData = data;
+    updatePredictionPage(data);
+    updateDashboardWithNewData(data);
+    renderRiskZones(data.predictions || []);
+    renderPredictionTimeline(data.predictions || [], latestOperationData);
+  } catch (error) {
+    console.error('Error fetching latest waste data:', error);
+  }
+}
+
+async function fetchOperationsStatus() {
+  try {
+    const response = await fetch('http://localhost:5000/api/operations/status');
+    const data = await response.json();
+    latestOperationData = data;
+    updateOperationsContent(data);
+    updateRouteData(data);
+    renderPredictionTimeline(latestWasteData?.predictions || [], data);
+  } catch (error) {
+    console.error('Error fetching operations status:', error);
+  }
+}
+
+function updateRouteData(data) {
+  const teams   = data.teams   || [];
+  const vessels = data.vessels || [];
+  ROUTES = (data.routes || []).map((route, idx) => ({
+    ...route,
+    color:  route.color || (route.priority === 1 ? '#ff3366' : route.priority === 2 ? '#ffd600' : '#00ff88'),
+    pts:    (route.path || []).map(p => normalizeRoutePoint(p.lat, p.lng)),
+    vessels: 1,
+    workers: teams[idx]?.size   || 0,
+    time:    route.estimatedTime || 0,
+    vessel:  vessels[idx]        || {}   // live vessel object for labels
+  }));
+
+  if (!selectedRoute && ROUTES.length) {
+    selectedRoute = ROUTES[0].id;
+  }
+
+  if (currentView === 'routes') {
+    buildRouteCards();
+    updateRouteStats();
+    cancelAnimationFrame(routeAnimFrame);
+    initRouteVessels();
+    drawRouteMap();
+  }
+}
+
+async function fetchModelMetrics() {
+  try {
+    const response = await fetch('http://localhost:5000/api/model/metrics');
+    const data = await response.json();
+    updateAImodelContent(data);
+  } catch (error) {
+    console.error('Error fetching AI model metrics:', error);
+  }
+}
+
+async function fetchDataSources() {
+  try {
+    const response = await fetch('http://localhost:5000/api/datasources');
+    const data = await response.json();
+    updateDataSourcesContent(data);
+  } catch (error) {
+    console.error('Error fetching datasources:', error);
+  }
+}
+
+function updateDashboardStats(stats) {
+  document.getElementById('h-zones').textContent = stats.activeZones;
+  document.getElementById('h-teams').textContent = stats.teamsDeployed;
+  document.getElementById('h-acc').textContent = stats.modelAccuracy + '%';
+
+  document.getElementById('m-waste').textContent = stats.totalWasteDetected.toLocaleString();
+  document.getElementById('m-risk').textContent = stats.highRiskZones;
+  document.getElementById('m-cleanups').textContent = stats.cleanupsCompleted;
+  document.getElementById('m-window').textContent = stats.avgPredictionWindow + 'h';
+
+  if (stats.activeStorms != null) {
+    const el = document.getElementById('storms-count');
+    if (el) el.textContent = stats.activeStorms + ' active';
+  }
+  if (stats.totalWasteReports != null) {
+    const el = document.getElementById('waste-reports-count');
+    if (el) el.textContent = stats.totalWasteReports + ' reports';
+  }
+
+  updatePerfChart(stats);
+}
+
+function updatePerfChart(stats = null) {
+  const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const predicted = stats ? labels.map((_, i) => Math.max(0, Math.round((stats.totalWasteDetected / 7) * (1 + (i - 3) * 0.05)))) : [820,740,910,650,880,720,840];
+  const actual    = stats ? labels.map((_, i) => Math.round(predicted[i] * (0.9 + Math.random() * 0.12)))                        : [790,760,870,680,840,750,820];
+
+  if (perfChartInst) {
+    perfChartInst.data.labels = labels;
+    perfChartInst.data.datasets[0].data = predicted;
+    perfChartInst.data.datasets[1].data = actual;
+    perfChartInst.update('active');
+    return;
+  }
+
+  const canvas = document.getElementById('perfChart');
+  if (!canvas) return;
+  const ctx2 = canvas.getContext('2d');
+
+  // Vertical gradient fills under each line
+  const gradCyan = ctx2.createLinearGradient(0, 0, 0, 220);
+  gradCyan.addColorStop(0,   'rgba(0,212,255,0.38)');
+  gradCyan.addColorStop(0.55,'rgba(0,212,255,0.10)');
+  gradCyan.addColorStop(1,   'rgba(0,212,255,0.00)');
+
+  const gradGreen = ctx2.createLinearGradient(0, 0, 0, 220);
+  gradGreen.addColorStop(0,   'rgba(0,255,136,0.28)');
+  gradGreen.addColorStop(0.55,'rgba(0,255,136,0.07)');
+  gradGreen.addColorStop(1,   'rgba(0,255,136,0.00)');
+
+  perfChartInst = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Predicted Waste Flow',
+          data: predicted,
+          borderColor: '#00d4ff',
+          backgroundColor: gradCyan,
+          fill: true,
+          tension: 0.45,
+          cubicInterpolationMode: 'monotone',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointHoverRadius: 9,
+          pointBackgroundColor: '#00d4ff',
+          pointBorderColor: 'rgba(255,255,255,0.9)',
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#00d4ff',
+          pointHoverBorderWidth: 2.5,
+        },
+        {
+          label: 'Actual Collection',
+          data: actual,
+          borderColor: '#00ff88',
+          backgroundColor: gradGreen,
+          fill: true,
+          tension: 0.45,
+          cubicInterpolationMode: 'monotone',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointHoverRadius: 9,
+          pointBackgroundColor: '#00ff88',
+          pointBorderColor: 'rgba(255,255,255,0.9)',
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#00ff88',
+          pointHoverBorderWidth: 2.5,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      animation: { duration: 900, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'end',
+          labels: {
+            color: 'rgba(160,220,255,0.85)',
+            font: { size: 11, weight: '600', family: "'Space Grotesk', sans-serif" },
+            usePointStyle: true,
+            pointStyleWidth: 8,
+            boxHeight: 6,
+            padding: 16,
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(4,18,38,0.94)',
+          borderColor: 'rgba(0,212,255,0.28)',
+          borderWidth: 1,
+          titleColor: 'rgba(0,212,255,0.92)',
+          bodyColor: 'rgba(180,230,255,0.85)',
+          titleFont: { size: 11, weight: '700', family: "'Space Grotesk', sans-serif" },
+          bodyFont:  { size: 11, family: "'Space Grotesk', sans-serif" },
+          padding: 10,
+          cornerRadius: 8,
+          displayColors: true,
+          boxWidth: 8,
+          boxHeight: 8,
+          callbacks: {
+            label: (c) => `  ${c.dataset.label}: ${c.parsed.y.toLocaleString()} t`
+          }
+        }
+      },
+      scales: {
+        x: {
+          border: { display: false },
+          ticks: {
+            color: 'rgba(120,190,230,0.70)',
+            font: { size: 10, family: "'Space Grotesk', sans-serif" },
+            padding: 6,
+          },
+          grid: { color: 'rgba(0,212,255,0.07)', drawTicks: false }
+        },
+        y: {
+          beginAtZero: false,
+          border: { display: false },
+          ticks: {
+            color: 'rgba(120,190,230,0.70)',
+            font: { size: 10, family: "'Space Grotesk', sans-serif" },
+            padding: 8,
+            maxTicksLimit: 5,
+            callback: (v) => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v,
+          },
+          grid: { color: 'rgba(0,212,255,0.07)', drawTicks: false }
+        }
+      }
+    }
+  });
+}
+
+function updateEnvironmentalDisplay(data) {
+  // Ocean current — prefer real marine current velocity when present
+  const curSpd = data.marine?.oceanCurrentVelocity != null
+    ? `${(data.marine.oceanCurrentVelocity * 1.944).toFixed(1)} knots`
+    : `${parseFloat(data.currentSpeed || 0).toFixed(1)} knots`;
+  document.getElementById('env-current').textContent = `${curSpd} ${data.currentDirection || ''}`;
+
+  document.getElementById('env-wind').textContent =
+    `${Math.round(data.windSpeed || 0)} km/h ${data.windDirection || ''}`;
+
+  // Tide — use real harmonic model level when available
+  if (data.tidal?.currentLevel != null) {
+    const nh = data.tidal.nextHigh;
+    document.getElementById('env-tide').textContent =
+      `${data.tidal.currentLevel.toFixed(2)}m ${data.tidal.trend || ''}` +
+      (nh?.hoursAway != null ? ` · next high ${nh.hoursAway}h` : '');
+  } else {
+    document.getElementById('env-tide').textContent =
+      `Incoming +${parseFloat(data.tideHeight || 0).toFixed(1)}m`;
+  }
+
+  // Wave height — prefer real marine reading
+  const wh = data.marine?.waveHeight ?? parseFloat(data.waveHeight || 0);
+  const sh = data.marine?.swellHeight;
+  document.getElementById('env-wave').textContent =
+    `${wh.toFixed(2)}m` + (sh != null ? ` · swell ${sh.toFixed(2)}m` : ' moderate');
+
+  // Air quality
+  if (data.airQuality) {
+    document.getElementById('env-aqi').textContent =
+      `AQI ${data.airQuality.aqi ?? '—'} · ${data.airQuality.category || '—'} · PM10 ${data.airQuality.pm10?.toFixed(1) ?? '—'} μg/m³`;
+  }
+}
+
+function updatePredictionPage(data) {
+  if (!data) return;
+  const prediction = (data.predictions || [])[0] || {};
+  const env = data.environmental || {};
+
+  document.getElementById('pred-zone').textContent = prediction.landingZone || 'Unknown';
+  document.getElementById('pred-timeimpact').textContent = prediction.timeframe || 'T+6h';
+  document.getElementById('pred-confidence').textContent = `${prediction.confidence || 0}%`;
+  document.getElementById('pred-current-vec').textContent = `+${parseFloat(env.currentSpeed || 0).toFixed(1)} kt ${env.currentDirection || 'N'}`;
+  document.getElementById('pred-wind-vec').textContent = `+${parseFloat(env.windSpeed || 0).toFixed(1)} kt ${env.windDirection || 'N'}`;
+  document.getElementById('pred-tide-vec').textContent = `+${parseFloat(env.tideHeight || 0).toFixed(1)} kt shore`;
+  document.getElementById('pred-net-vec').textContent = `${Math.round((parseFloat(env.currentSpeed || 0) + parseFloat(env.windSpeed || 0) * 0.03 + parseFloat(env.tideHeight || 0) * 0.1) * 10) / 10} kt · ${env.currentDirection || 'N'}`;
+
+  if (prediction.riskLevel) {
+    document.getElementById('pred-zone').className = prediction.riskLevel === 'HIGH' ? 'high-risk' : 'medium-risk';
+  }
+
+  if (env.currentSpeed) {
+    predParams.currentSpeed = parseFloat(env.currentSpeed);
+    document.getElementById('p-currentSpeed').textContent = `${predParams.currentSpeed.toFixed(1)} knots`;
+    document.getElementById('input-currentSpeed').value = predParams.currentSpeed;
+  }
+  if (env.windSpeed) {
+    predParams.windSpeed = parseFloat(env.windSpeed);
+    document.getElementById('p-windSpeed').textContent = `${Math.round(predParams.windSpeed)} km/h`;
+    document.getElementById('input-windSpeed').value = predParams.windSpeed;
+  }
+  if (env.tideHeight) {
+    predParams.tideAmplitude = parseFloat(env.tideHeight);
+    document.getElementById('p-tideAmplitude').textContent = `${predParams.tideAmplitude.toFixed(1)} m`;
+    document.getElementById('input-tideAmplitude').value = predParams.tideAmplitude;
+  }
+  if (prediction.tons) {
+    predParams.wasteDensity = prediction.tons;
+    document.getElementById('p-wasteDensity').textContent = `${Math.round(predParams.wasteDensity)} tons`;
+    document.getElementById('input-wasteDensity').value = predParams.wasteDensity;
+  }
+  recalcPrediction();
+  updateTrajectoryChart();
+}
+
+function renderRiskZones(predictions) {
+  const container = document.getElementById('risk-zones-container');
+  if (!container) return;
+  if (!predictions || !predictions.length) {
+    container.innerHTML = `
+      <div class="risk-zone low">
+        <div>
+          <div class="risk-name">Waiting for live risk analysis</div>
+          <div class="risk-meta">Predictions and risk data are being loaded from MongoDB.</div>
+        </div>
+        <span class="risk-tag low">PENDING</span>
+      </div>`;
+    return;
+  }
+  const sorted = [...predictions].sort((a, b) => {
+    const score = level => level === 'HIGH' ? 3 : level === 'MEDIUM' ? 2 : 1;
+    return score(b.riskLevel) - score(a.riskLevel);
+  });
+  container.innerHTML = sorted.slice(0, 3).map(pred => {
+    const level = (pred.riskLevel || 'MEDIUM').toLowerCase();
+    const displayRisk = (pred.riskLevel || 'MEDIUM').toUpperCase();
+    return `
+      <div class="risk-zone ${level}">
+        <div>
+          <div class="risk-name">${pred.landingZone || 'Unknown Zone'}</div>
+          <div class="risk-meta">${pred.tons || 0} tons • density ${pred.density || 0}</div>
+        </div>
+        <span class="risk-tag ${level}">${displayRisk}</span>
+      </div>`;
+  }).join('');
+}
+
+function renderPredictionTimeline(predictions, operations) {
+  const container = document.getElementById('timeline-container');
+  if (!container) return;
+  const items = [];
+  const now = new Date();
+  if (predictions && predictions.length) {
+    const top = predictions[0];
+    items.push({
+      status: 'done',
+      time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      title: `Forecast updated for ${top.landingZone || 'target'}`,
+      desc: `${top.tons || 0} tons projected • ${top.confidence || 0}% confidence`
+    });
+    items.push({
+      status: 'active',
+      time: top.timeframe || 'T+4h',
+      title: `${top.landingZone || 'Primary zone'} impact window`,
+      desc: `${top.riskLevel || 'MEDIUM'} risk • ${top.density || 0} density`
+    });
+  }
+  if (operations && operations.routes && operations.routes.length) {
+    operations.routes.slice(0, 2).forEach((route, index) => {
+      items.push({
+        status: index === 0 ? 'active' : 'pending',
+        time: route.estimatedTime ? `In ${route.estimatedTime}h` : 'Scheduled',
+        title: `${route.id || 'Route'} dispatch`,
+        desc: `${route.wasteCollected || 0}t planned to ${route.stops?.[1] || 'target zone'}`
+      });
+    });
+  }
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="timeline-item pending">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">Live timeline pending</div>
+        <div class="timeline-title">Waiting for data from backend</div>
+        <div class="timeline-desc">Live timeline will appear once predictions and route telemetry arrive.</div>
+      </div>`;
+    return;
+  }
+  container.innerHTML = items.map(item => `
+    <div class="timeline-item ${item.status}">
+      <div class="timeline-dot"></div>
+      <div class="timeline-time">${item.time}</div>
+      <div class="timeline-title">${item.title}</div>
+      <div class="timeline-desc">${item.desc}</div>
+    </div>
+  `).join('');
+}
+
+function updateDashboardWithNewData(data) {
+  // Update waste metrics
+  if (data.wasteData) {
+    document.getElementById('m-waste').textContent = data.wasteData.tons.toLocaleString();
+  }
+
+  // Update environmental data
+  if (data.environmental) {
+    updateEnvironmentalDisplay(data.environmental);
+  }
+
+  // Render risk zone cards from live predictions
+  renderRiskZones(data.predictions || []);
+
+  // Render timeline from latest predictions and operations
+  renderPredictionTimeline(data.predictions || [], latestOperationData);
+
+  // Build diverse alerts from all live data — deduplication handled inside
+  buildAlertsFromLiveData(data, latestDashboardStats, latestEnvData);
+}
+
+function updateOperationsWithNewData(data) {
+  console.log('Operations updated:', data);
+  updateOperationsContent(data);
+  updateRouteData(data);
+}
+
+function updateOperationsContent(data) {
+  const summary = data.summary || {};
+  document.getElementById('ops-teams').textContent = summary.teamsActive || (data.teams || []).length || 0;
+  document.getElementById('ops-vessels').textContent = summary.vesselsAtSea || (data.vessels || []).length || 0;
+  document.getElementById('ops-recovered').textContent = summary.recoveredToday || 0;
+  document.getElementById('ops-efficiency').textContent = `${summary.efficiency || 78}%`;
+
+  const routes = data.routes || [];
+  const labels = routes.length ? routes.map(r => r.id) : ['No Data'];
+  const recovered = routes.length ? routes.map(r => r.wasteCollected || 0) : [0];
+
+  const canvas = document.getElementById('operationsChart');
+  if (canvas) {
+    if (operationsChartInst) {
+      operationsChartInst.data.labels = labels;
+      operationsChartInst.data.datasets[0].data = recovered;
+      operationsChartInst.update('none');
+    } else {
+      operationsChartInst = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Recovered (tons)',
+            data: recovered,
+            backgroundColor: 'rgba(0,212,255,0.6)',
+            borderColor: '#00d4ff',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#7eb8d4', font: { size: 11, weight: '600' } } }
+          },
+          scales: {
+            x: { ticks: { color: '#7eb8d4', font: { size: 10 } }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: '#7eb8d4', font: { size: 10 } }, grid: { color: 'rgba(0,212,255,0.08)' } }
+          }
+        }
+      });
+    }
+  }
+
+  const list = document.getElementById('operations-list');
+  if (list) {
+    const vessels = data.vessels || [];
+    const teams = data.teams || [];
+    let html = '';
+    if (vessels.length) {
+      html += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:8px;">Vessels</div>';
+      html += vessels.map(v => {
+        const name = v.name || v.id || 'Vessel';
+        const status = v.status || 'ACTIVE';
+        const tons = v.loaded || 0;
+        return `<div style="margin-bottom:8px;">• <strong>${name}</strong>: ${status}, ${tons}t onboard (${v.crew || 0} crew)</div>`;
+      }).join('');
+    }
+    if (teams.length) {
+      html += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin:16px 0 8px;">Teams</div>';
+      html += teams.map(t => {
+        return `<div style="margin-bottom:8px;">• <strong>${t.name}</strong> (${t.size} members): ${t.status} — ${t.assignment}</div>`;
+      }).join('');
+    }
+    list.innerHTML = html || '<div>No active vessels or teams currently deployed.</div>';
+  }
+}
+
+function updateAImodelContent(data) {
+  document.getElementById('model-accuracy').textContent = `${data.accuracy?.toFixed(1) || 0}%`;
+  document.getElementById('model-horizon').textContent = `${data.maxForecastWindow || 0}h`;
+  document.getElementById('model-lasttrained').textContent = data.lastRetrained ? new Date(data.lastRetrained).toLocaleDateString() : 'n/a';
+  document.getElementById('model-datapoints').textContent = data.trainingDataPoints?.toLocaleString() || 0;
+
+  const labels = (data.weeklyAccuracy || []).map((_, idx) => `Day ${idx + 1}`);
+  const accuracy = data.weeklyAccuracy || [];
+  const loss = data.lossHistory || [];
+
+  const canvas = document.getElementById('aimodelChart');
+  if (!canvas) return;
+
+  if (aimodelChartInst) {
+    aimodelChartInst.data.labels = labels;
+    aimodelChartInst.data.datasets[0].data = accuracy;
+    aimodelChartInst.data.datasets[1].data = loss;
+    aimodelChartInst.update('none');
+  } else {
+    aimodelChartInst = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Weekly Accuracy',
+            data: accuracy,
+            borderColor: '#00d4ff',
+            backgroundColor: 'rgba(0,212,255,0.12)',
+            tension: 0.35,
+            pointRadius: 3,
+            borderWidth: 2,
+            yAxisID: 'y'
+          },
+          {
+            label: 'Training Loss',
+            data: loss,
+            borderColor: '#ffb400',
+            backgroundColor: 'rgba(255,180,0,0.12)',
+            tension: 0.35,
+            pointRadius: 3,
+            borderWidth: 2,
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#7eb8d4', font: { size: 11, weight: '600' } } } },
+        scales: {
+          x: { ticks: { color: '#7eb8d4', font: { size: 10 } }, grid: { color: 'rgba(0,212,255,0.08)' } },
+          y: { position: 'left', beginAtZero: true, ticks: { color: '#7eb8d4', font: { size: 10 } }, grid: { color: 'rgba(0,212,255,0.08)' } },
+          y1: { position: 'right', beginAtZero: true, ticks: { color: '#ffb400', font: { size: 10 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+}
+
+function updateDataSourcesContent(data) {
+  document.getElementById('ds-live-count').textContent = data.totalFeeds || (data.feeds || []).length || 0;
+  document.getElementById('ds-frequency').textContent = data.updateFrequency || '15m';
+  document.getElementById('ds-points').textContent = data.dataPointsPerDay?.toLocaleString() || 0;
+
+  const feeds = data.feeds || [];
+  const labels = feeds.map(f => f.name || 'Feed');
+  const statuses = feeds.map(f => (f.status === 'live' || f.status === 'online') ? 1 : 0);
+
+  const canvas = document.getElementById('datasourceChart');
+  if (canvas) {
+    if (datasourceChartInst) {
+      datasourceChartInst.data.labels = labels;
+      datasourceChartInst.data.datasets[0].data = statuses;
+      datasourceChartInst.update('none');
+    } else {
+      datasourceChartInst = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Live Feed Status',
+            data: statuses,
+            backgroundColor: 'rgba(0,255,136,0.65)',
+            borderColor: '#00ff88',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#7eb8d4', font: { size: 11, weight: '600' } } } },
+          scales: {
+            x: { ticks: { color: '#7eb8d4', font: { size: 10 } }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: '#7eb8d4', font: { size: 10 }, callback: v => v === 1 ? 'Online' : 'Offline' }, grid: { color: 'rgba(0,212,255,0.08)' }, max: 1 }
+          }
+        }
+      });
+    }
+  }
+
+  const list = document.getElementById('datasource-list');
+  if (list) {
+    if (!feeds.length) {
+      list.innerHTML = '<div>No connected feeds found.</div>';
+    } else {
+      list.innerHTML = feeds.map(f => {
+        const status = f.status || 'offline';
+        return `<div style="margin-bottom: 10px;">• <strong>${f.name}</strong>: ${status.toUpperCase()} — ${f.value || f.description || 'Live telemetry source'}</div>`;
+      }).join('');
+    }
+  }
+}
+
+// ---- Alert deduplication registry ----
+const _alertsSeen = new Map(); // title → timestamp last shown
+
+function addAlert({ icon = '⚠️', title, body, severity = 'warning', maxAgeMs = 10 * 60 * 1000 }) {
+  if (!title) return;
+  const now = Date.now();
+  // Skip if the same alert title was shown within maxAgeMs
+  if (_alertsSeen.has(title) && now - _alertsSeen.get(title) < maxAgeMs) return;
+  _alertsSeen.set(title, now);
+
+  const container = document.getElementById('alerts-container');
+  if (!container) return;
+
+  // Remove the "waiting for data" placeholder if still present
+  const placeholder = container.querySelector('.alert.info');
+  if (placeholder && placeholder.textContent.includes('Waiting for live data')) placeholder.remove();
+
+  const el = document.createElement('div');
+  el.className = `alert ${severity}`;
+  el.innerHTML = `
+    <div class="alert-icon">${icon}</div>
+    <div>
+      <div class="alert-title">${title}</div>
+      <div class="alert-body">${body}</div>
+    </div>`;
+  container.insertBefore(el, container.firstChild);
+  while (container.children.length > 6) container.removeChild(container.lastChild);
+}
+
+// Builds alerts from all live data sources — called after any data refresh
+function buildAlertsFromLiveData(wasteData, stats, envData) {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+  // 1. Per-zone predictions (show one alert per HIGH-risk zone, not one generic one)
+  if (wasteData?.predictions?.length) {
+    wasteData.predictions.forEach(pred => {
+      if (pred.riskLevel === 'HIGH') {
+        addAlert({
+          icon: '🚨', severity: 'danger',
+          title: `High Risk: ${pred.landingZone}`,
+          body:  `${pred.tons}t waste · ${pred.confidence}% confidence · Impact ${pred.timeframe}`,
+          maxAgeMs: 8 * 60 * 1000
+        });
+      } else if (pred.riskLevel === 'MEDIUM') {
+        addAlert({
+          icon: '⚠️', severity: 'warning',
+          title: `Medium Risk: ${pred.landingZone}`,
+          body:  `${pred.tons}t projected · ETA ${pred.timeframe} · Monitor advised`,
+          maxAgeMs: 12 * 60 * 1000
+        });
+      }
+    });
+  }
+
+  // 2. Active storm events
+  if (stats?.activeStorms > 0) {
+    addAlert({
+      icon: '🌀', severity: stats.activeStorms >= 3 ? 'danger' : 'warning',
+      title: `${stats.activeStorms} Active Storm Event${stats.activeStorms > 1 ? 's' : ''} Tracked`,
+      body:  `NASA EONET monitoring ${stats.activeStorms} open storm event(s) in the region · ${timeStr}`,
+      maxAgeMs: 15 * 60 * 1000
+    });
+  }
+
+  // 3. Wave height alert from environmental data
+  const waveH = envData?.marine?.waveHeight ?? wasteData?.environmental?.waveHeight;
+  if (waveH && waveH > 2.0) {
+    addAlert({
+      icon: '🌊', severity: 'danger',
+      title: `High Seas: ${waveH.toFixed(1)}m Waves Detected`,
+      body:  `${envData?.marine?.location || 'Offshore station'} · Vessel operations at risk · Reduce exposure`,
+      maxAgeMs: 10 * 60 * 1000
+    });
+  } else if (waveH && waveH > 1.2) {
+    addAlert({
+      icon: '🌊', severity: 'warning',
+      title: `Moderate Swell: ${waveH.toFixed(1)}m Wave Height`,
+      body:  `Monitor offshore conditions · Increased drift dispersion expected`,
+      maxAgeMs: 12 * 60 * 1000
+    });
+  }
+
+  // 4. Air quality
+  const aqi = envData?.airQuality?.aqi;
+  if (aqi && aqi > 60) {
+    addAlert({
+      icon: '💨', severity: aqi > 80 ? 'danger' : 'warning',
+      title: `Air Quality ${envData.airQuality.category}: AQI ${aqi}`,
+      body:  `PM10 ${envData.airQuality.pm10?.toFixed(1)} μg/m³ · PM2.5 ${envData.airQuality.pm2_5?.toFixed(1)} μg/m³ · Coastal zone`,
+      maxAgeMs: 15 * 60 * 1000
+    });
+  }
+
+  // 5. Tidal anomaly
+  const tidal = envData?.tidal;
+  if (tidal) {
+    if (tidal.currentLevel > 1.4) {
+      addAlert({
+        icon: '🌊', severity: 'warning',
+        title: `High Tide at ${tidal.station}: ${tidal.currentLevel}m`,
+        body:  `Trend: ${tidal.trend} · Next high ${tidal.nextHigh?.hoursAway?.toFixed(1)}h away · Enhanced coastal drift risk`,
+        maxAgeMs: 10 * 60 * 1000
+      });
+    }
+  }
+
+  // 6. Total waste volume threshold
+  const totalTons = wasteData?.wasteData?.tons;
+  if (totalTons && totalTons > 2000) {
+    addAlert({
+      icon: '📊', severity: 'danger',
+      title: `Critical Waste Volume: ${totalTons.toLocaleString()} tons`,
+      body:  `Exceeds 2,000t emergency threshold · ${stats?.highRiskZones || 0} HIGH-risk zones active`,
+      maxAgeMs: 10 * 60 * 1000
+    });
+  }
+
+  // 7. Recovery progress
+  if (stats?.recoveredToday > 0) {
+    addAlert({
+      icon: '✅', severity: 'info',
+      title: `Recovery Update: ${stats.recoveredToday}t Collected Today`,
+      body:  `${stats.teamsDeployed} teams · ${stats.vesselsDeployed} vessels · ${stats.cleanupsCompleted} zones cleared`,
+      maxAgeMs: 20 * 60 * 1000
+    });
+  }
+}
+
+// Legacy shim — kept for backward compatibility with socket.on('waste-data-update')
+function addNewAlert(data) {
+  buildAlertsFromLiveData(data, null, null);
+}
+
+async function refreshData(event) {
+  const btn = event.target;
+  btn.innerHTML = '<span class="loading"></span> Refreshing...';
+  btn.disabled = true;
+
+  try {
+    await Promise.all([
+      fetchDashboardStats(),
+      fetchEnvironmentalData(),
+      fetchWasteLatest(),
+      fetchOperationsStatus()
+    ]);
+  } finally {
+    btn.innerHTML = '🔄 Refresh Data';
+    btn.disabled = false;
+  }
+}
+
+// ==================== NAVIGATION ====================
+function switchView(view) {
+  cancelAnimationFrame(animFrame);
+  cancelAnimationFrame(driftAnimFrame);
+  cancelAnimationFrame(routeAnimFrame);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const targetView = document.getElementById('view-' + view);
+  if (targetView) targetView.classList.add('active');
+
+  const navBtn = document.querySelector(`[data-view="${view}"]`);
+  if (navBtn) navBtn.classList.add('active');
+
+  if (view === 'login') {
+    document.querySelector('.header')?.classList.add('hidden');
+    document.querySelector('.nav')?.classList.add('hidden');
+  } else {
+    document.querySelector('.header')?.classList.remove('hidden');
+    document.querySelector('.nav')?.classList.remove('hidden');
+  }
+
+  currentView = view;
+
+  setTimeout(() => {
+    if (view === 'dashboard') {
+      fetchDashboardStats();
+      fetchEnvironmentalData();
+      fetchWasteLatest();
+      fetchOperationsStatus();
+      fetchMarineData();
+      fetchAirQualityData();
+      fetchStorms();
+      fetchTidalData();
+      fetchWasteReports();
+      drawOceanMap();
+    } else if (view === 'prediction') {
+      fetchWasteLatest();
+      initDriftParticles();
+      drawDriftCanvas();
+      drawTrajectoryChart();
+    } else if (view === 'routes') {
+      fetchWasteLatest();       // needed for waste badges on stop nodes
+      fetchOperationsStatus();  // populates ROUTES → triggers buildRouteCards/initRouteVessels/drawRouteMap
+      buildRouteCards();        // render whatever state we already have
+      updateRouteStats();
+      cancelAnimationFrame(routeAnimFrame);
+      // Init vessels for whichever route set is active
+      if (ROUTES.length) initRouteVessels();
+      else FALLBACK_ROUTES.forEach(r => ensureVesselsForRoute(r));
+      drawRouteMap();
+    } else if (view === 'operations') {
+      fetchOperationsStatus();
+    } else if (view === 'aimodel') {
+      fetchModelMetrics();
+    } else if (view === 'datasources') {
+      fetchDataSources();
+    }
+  }, 50);
+}
+
+function switchAuthTab(mode) {
+  document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+  document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+  document.getElementById('loginForm').classList.toggle('hidden', mode !== 'login');
+  document.getElementById('registerForm').classList.toggle('hidden', mode !== 'register');
+  document.getElementById('authSubtitle').textContent = mode === 'login'
+    ? 'Sign in to access ocean waste monitoring and analysis.'
+    : 'Register an account to manage cleanup operations and live predictions.';
+}
+
+function handleLogin(event) {
+  event.preventDefault();
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!username || !password) {
+    alert('Please enter both username and password.');
+    return;
+  }
+
+  isAuthenticated = true;
+  loggedInUser = username;
+  setProfileInitial(username);
+  document.getElementById('connectionStatus').innerHTML = `<div class="live-dot"></div> Connected as ${username}`;
+  switchView('dashboard');
+}
+
+function handleRegister(event) {
+  event.preventDefault();
+  const username = document.getElementById('registerUsername').value.trim();
+  const email = document.getElementById('registerEmail').value.trim();
+  const password = document.getElementById('registerPassword').value;
+  const confirm = document.getElementById('registerConfirm').value;
+  if (!username || !email || !password || !confirm) {
+    alert('Please complete all registration fields.');
+    return;
+  }
+  if (password !== confirm) {
+    alert('Passwords do not match.');
+    return;
+  }
+
+  isAuthenticated = true;
+  loggedInUser = username;
+  document.getElementById('connectionStatus').innerHTML = `<div class="live-dot"></div> Registered as ${username}`;
+  setProfileInitial(username);
+  alert('Registration complete. Redirecting to dashboard...');
+  switchView('dashboard');
+}
+
+function setProfileInitial(username) {
+  const initial = username ? username[0].toUpperCase() : 'U';
+  document.getElementById('profileInitial').textContent = initial;
+}
+
+function toggleProfileMenu(event) {
+  event.stopPropagation();
+  const menu = document.getElementById('profileMenu');
+  menu.classList.toggle('active');
+}
+
+function closeProfileMenu() {
+  const menu = document.getElementById('profileMenu');
+  menu.classList.remove('active');
+}
+
+function viewProfile() {
+  closeProfileMenu();
+  alert(`Profile for ${loggedInUser || 'User'}\n\nRole: Analyst\nStatus: Active`);
+}
+
+function logout() {
+  closeProfileMenu();
+  isAuthenticated = false;
+  loggedInUser = null;
+  document.getElementById('connectionStatus').innerHTML = '<div class="live-dot"></div> Disconnected from server';
+  switchView('login');
+}
+
+window.addEventListener('click', () => closeProfileMenu());
+
+// ==================== OCEAN MAP ====================
+function getRoutePoint(path, progress) {
+  if (!path || path.length < 2) return null;
+  const n = path.length - 1;
+  const seg = Math.min(n - 1, Math.floor(progress * n));
+  const t = (progress * n) - seg;
+  return {
+    lat: path[seg].lat + (path[seg + 1].lat - path[seg].lat) * t,
+    lng: path[seg].lng + (path[seg + 1].lng - path[seg].lng) * t
+  };
+}
+
+function geoToCanvas(lat, lng, W, H) {
+  const x = ((lng + 180) / 360) * W;
+  const y = ((90 - lat) / 180) * H;
+  return { x, y };
+}
+
+function drawLiveWorldRoutes(ctx, W, H) {
+  const op = latestOperationData;
+  if (!op || !op.routes?.length) return;
+
+  worldMapTick += 1;
+  op.routes.forEach((route, index) => {
+    const points = (route.path || []).map(p => geoToCanvas(p.lat, p.lng, W, H));
+    if (points.length < 2) return;
+
+    ctx.save();
+    ctx.strokeStyle = route.color || (index === 0 ? '#ff3366' : index === 1 ? '#ffd600' : '#00ff88');
+    ctx.lineWidth = 3.5;
+    ctx.globalAlpha = mapLayer === 'risk' ? 0.50 : 0.40;
+    ctx.beginPath();
+    points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+    ctx.restore();
+
+    // Waypoint dots and animated moving dot removed — all cluster at same pixel on world map
+  });
+
+  // Vessel markers removed — all share same Tamil Nadu coords, cluster at one pixel on world map
+}
+
+function drawOceanMap() {
+  const canvas = document.getElementById('oceanMap');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth;
+  const H = 380;
+  canvas.height = H;
+
+  if (worldMapLoaded) {
+    ctx.globalAlpha = 1;
+    ctx.drawImage(worldMapImage, 0, 0, W, H);
+    // Very light tint — let the map image stay visible
+    ctx.fillStyle = 'rgba(2, 14, 34, 0.08)';
+    ctx.fillRect(0, 0, W, H);
+  } else {
+    ctx.fillStyle = '#020a14';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Ocean basin tints removed — map image provides the base colour
+
+  // ---- GRID ----
+  ctx.strokeStyle = 'rgba(0,212,255,0.10)';
+  ctx.lineWidth = 0.7;
+  for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  if (mapLayer === 'waste' || mapLayer === 'risk') {
+    const inferredZones = latestWasteData?.predictions?.length ? latestWasteData.predictions.map((item) => ({
+      lat: item.location?.coordinates?.lat || 0,
+      lng: item.location?.coordinates?.lng || 0,
+      r: Math.min(72, 18 + (item.tons || 120) * 0.025),
+      intensity: item.riskLevel === 'HIGH' ? 0.95 : item.riskLevel === 'MEDIUM' ? 0.65 : 0.35,
+      label: item.landingZone || 'Zone',
+      tons: item.tons || 0,
+      riskLevel: item.riskLevel || 'MEDIUM'
+    })) : [];
+
+    inferredZones.forEach(z => {
+      const { x, y } = geoToCanvas(z.lat, z.lng, W, H);
+      const r = z.r * (W / 700);
+      const level = (z.riskLevel || 'MEDIUM').toUpperCase();
+      const color = level === 'HIGH' ? 'rgba(255,51,102' : level === 'MEDIUM' ? 'rgba(255,214,0' : 'rgba(0,255,136';
+      const fillIntensity = z.intensity || 0.5;
+
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `${color},${fillIntensity})`);
+      g.addColorStop(0.4, `${color},${Math.max(0.18, fillIntensity * 0.55)})`);
+      g.addColorStop(0.8, `${color},${Math.max(0.08, fillIntensity * 0.25)})`);
+      g.addColorStop(1, `${color},0)`);
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+
+      // Zone labels omitted on world map — all TN coords collapse to same pixel
+    });
+  }
+
+  drawLiveWorldRoutes(ctx, W, H);
+
+  const currentSpeed = latestWasteData?.environmental?.currentSpeed || 2.4;
+  const driftAngle = Math.sin(time * 0.3) * 0.6 + 0.4;
+  for (let x = 60; x < W - 60; x += 90) {
+    for (let y = 45; y < H - 45; y += 60) {
+      const ang = driftAngle + Math.sin((x + y) * 0.012) * 0.3;
+      const len = 24 + currentSpeed * 3;
+      const ex = x + Math.cos(ang) * len;
+      const ey = y + Math.sin(ang) * len;
+      const hue = Math.round(165 + (x / W) * 60 + Math.sin(y * 0.04) * 20);
+      const arrowColor = `hsla(${hue},100%,65%,0.32)`;
+      const arrowFill  = `hsla(${hue},100%,70%,0.50)`;
+      ctx.strokeStyle = arrowColor;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(ex, ey); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(ex, ey);
+      ctx.lineTo(ex - Math.cos(ang - 0.35) * 7, ey - Math.sin(ang - 0.35) * 7);
+      ctx.lineTo(ex - Math.cos(ang + 0.35) * 7, ey - Math.sin(ang + 0.35) * 7);
+      ctx.closePath();
+      ctx.fillStyle = arrowFill;
+      ctx.fill();
+    }
+  }
+
+  // ---- CURRENTS LAYER — streamlines with speed-coded colour ----
+  if (mapLayer === 'current') {
+    ctx.save();
+    // Named ocean current corridors: [x1,y1, x2,y2, speed 0-1, label]
+    const currents = [
+      [0.08, 0.28, 0.38, 0.24, 0.85, 'Gulf Stream'],
+      [0.38, 0.24, 0.62, 0.34, 0.70, 'N. Atlantic Drift'],
+      [0.05, 0.52, 0.28, 0.60, 0.55, 'S. Equatorial'],
+      [0.28, 0.60, 0.50, 0.55, 0.60, 'Brazil Current'],
+      [0.62, 0.34, 0.78, 0.38, 0.65, 'Somali Current'],
+      [0.78, 0.38, 0.90, 0.30, 0.50, 'Kuroshio'],
+      [0.10, 0.70, 0.60, 0.80, 0.45, 'Antarctic Circ.'],
+      [0.55, 0.55, 0.72, 0.60, 0.55, 'Agulhas Current'],
+    ];
+    currents.forEach(([x1f, y1f, x2f, y2f, spd, label]) => {
+      const x1 = x1f*W, y1 = y1f*H, x2 = x2f*W, y2 = y2f*H;
+      // Speed → colour: slow=teal(180°) → fast=azure(210°)
+      const hue = Math.round(180 + spd * 30);
+      const lineCol = `hsla(${hue},70%,62%,0.70)`;
+      const arrowCol = `hsla(${hue},70%,72%,0.85)`;
+
+      // Animated offset along line
+      const offset = (time * spd * 60) % 1;
+      const dx = x2 - x1, dy = y2 - y1, ang = Math.atan2(dy, dx);
+      const len = Math.sqrt(dx*dx + dy*dy);
+
+      // Stream line
+      ctx.strokeStyle = lineCol;
+      ctx.lineWidth = 1.8;
+      ctx.setLineDash([10, 6]);
+      ctx.lineDashOffset = -offset * 16;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.setLineDash([]); ctx.lineDashOffset = 0;
+
+      // Arrowhead at 60% along the line
+      const ax = x1 + dx * (0.55 + offset * 0.3), ay = y1 + dy * (0.55 + offset * 0.3);
+      const hs = 7;
+      ctx.fillStyle = arrowCol;
+      ctx.beginPath();
+      ctx.moveTo(ax + Math.cos(ang)*hs, ay + Math.sin(ang)*hs);
+      ctx.lineTo(ax + Math.cos(ang+2.4)*hs*0.6, ay + Math.sin(ang+2.4)*hs*0.6);
+      ctx.lineTo(ax + Math.cos(ang-2.4)*hs*0.6, ay + Math.sin(ang-2.4)*hs*0.6);
+      ctx.closePath(); ctx.fill();
+
+      // Speed badge at midpoint
+      const mx = (x1+x2)/2, my = (y1+y2)/2;
+      ctx.font = '500 8.5px "Space Grotesk", sans-serif';
+      ctx.textAlign = 'center';
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(4,12,28,0.68)';
+      ctx.beginPath(); ctx.roundRect(mx - tw/2 - 5, my - 10, tw + 10, 13, 3); ctx.fill();
+      ctx.fillStyle = arrowCol;
+      ctx.fillText(label, mx, my);
+
+      // Speed indicator dot on origin
+      const dotR = 3 + spd * 3;
+      ctx.fillStyle = arrowCol;
+      ctx.globalAlpha = 0.7;
+      ctx.beginPath(); ctx.arc(x1, y1, dotR, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    // Legend — bottom-left
+    ctx.font = '600 9px "Space Grotesk", sans-serif';
+    ctx.fillStyle = 'rgba(4,12,28,0.72)';
+    ctx.beginPath(); ctx.roundRect(10, H - 36, 130, 28, 4); ctx.fill();
+    ctx.fillStyle = 'rgba(160,210,230,0.85)';
+    ctx.textAlign = 'left';
+    ctx.fillText('● Fast  ● Med  ● Slow', 18, H - 19);
+    ctx.restore();
+  }
+
+  // ---- RISK LAYER — heat-grid with severity zones ----
+  if (mapLayer === 'risk') {
+    ctx.save();
+    // Static risk hotspots [xf, yf, radius-fraction, severity 0-1, label]
+    const riskZones = [
+      [0.62, 0.50, 0.10, 0.92, 'CRITICAL',  'Indian Ocean Gyre'],
+      [0.44, 0.48, 0.07, 0.75, 'HIGH',      'Guinea Current'],
+      [0.30, 0.22, 0.06, 0.65, 'HIGH',      'N. Atlantic'],
+      [0.55, 0.28, 0.05, 0.50, 'MEDIUM',    'Mediterranean'],
+      [0.72, 0.35, 0.06, 0.55, 'MEDIUM',    'Arabian Sea'],
+      [0.20, 0.58, 0.06, 0.45, 'MEDIUM',    'Brazil Coast'],
+      [0.80, 0.28, 0.05, 0.35, 'LOW',       'S. China Sea'],
+      [0.10, 0.30, 0.05, 0.30, 'LOW',       'N. Pacific'],
+    ];
+
+    riskZones.forEach(([xf, yf, rf, sev, tier, label]) => {
+      const rx = xf*W, ry = yf*H, rr = rf * Math.min(W, H);
+      // Colour: critical=deep red, high=amber, medium=slate-gold, low=steel-blue
+      const [r,g,b] = tier === 'CRITICAL' ? [200,50,70]
+                    : tier === 'HIGH'     ? [195,130,40]
+                    : tier === 'MEDIUM'   ? [150,150,60]
+                    :                       [60,120,160];
+      const pulse = 0.55 + Math.sin(time * 1.8 + xf * 10) * 0.15;
+
+      // Radial heat blob
+      const rg = ctx.createRadialGradient(rx, ry, 0, rx, ry, rr);
+      rg.addColorStop(0,   `rgba(${r},${g},${b},${(sev * 0.55 * pulse).toFixed(2)})`);
+      rg.addColorStop(0.5, `rgba(${r},${g},${b},${(sev * 0.18).toFixed(2)})`);
+      rg.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+      ctx.fillStyle = rg;
+      ctx.beginPath(); ctx.arc(rx, ry, rr, 0, Math.PI*2); ctx.fill();
+
+      // Pulsing border ring
+      const ringR = rr * 0.38 * pulse;
+      ctx.strokeStyle = `rgba(${r},${g},${b},0.45)`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(rx, ry, ringR, 0, Math.PI*2); ctx.stroke();
+
+      // Label chip — tier colour text, dark bg
+      ctx.font = `600 9px "Space Grotesk", sans-serif`;
+      ctx.textAlign = 'center';
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(4,10,22,0.72)';
+      ctx.beginPath(); ctx.roundRect(rx - tw/2 - 5, ry - 10, tw + 10, 13, 3); ctx.fill();
+      ctx.fillStyle = `rgba(${r+55},${g+55},${b+55},0.95)`;
+      ctx.fillText(label, rx, ry);
+    });
+
+    // Risk legend — bottom left
+    const legend = [['CRITICAL','rgba(200,50,70,0.9)'],['HIGH','rgba(195,130,40,0.9)'],['MEDIUM','rgba(155,155,65,0.9)'],['LOW','rgba(80,150,190,0.9)']];
+    ctx.fillStyle = 'rgba(4,10,22,0.78)';
+    ctx.beginPath(); ctx.roundRect(10, H - 74, 82, 66, 5); ctx.fill();
+    legend.forEach(([tier, col], i) => {
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.arc(22, H - 60 + i * 14, 4, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(200,215,230,0.85)';
+      ctx.font = '500 8.5px "Space Grotesk", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(tier, 30, H - 56 + i * 14);
+    });
+    ctx.restore();
+  }
+
+  // ---- Waste drift paths (shown on all layers) ----
+  time += 0.015;
+  const paths = [
+    { sx: 0.3,  sy: 0.2,  ex: 0.65, ey: 0.3,  color: '#e05c7a', from: 'N. Atlantic',    to: 'Arabian Sea'    },
+    { sx: 0.2,  sy: 0.6,  ex: 0.45, ey: 0.55, color: '#c9a227', from: 'Brazil Coast',   to: 'Gulf of Guinea' },
+    { sx: 0.4,  sy: 0.7,  ex: 0.75, ey: 0.6,  color: '#3aab78', from: 'Mozambique Ch.', to: 'Bay of Bengal'  },
+  ];
+
+  // Helper: endpoint hub — visible pulsing dot + label
+  function drawHub(hx, hy, hcolor, label, pulse) {
+    ctx.save();
+    // Outer pulsing ring
+    const pulseR = 12 + Math.sin(time * 2 + pulse) * 4;
+    ctx.globalAlpha = 0.45 + Math.sin(time * 2 + pulse) * 0.15;
+    ctx.strokeStyle = hcolor;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.arc(hx, hy, pulseR, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1;
+    // Core filled dot
+    ctx.fillStyle = hcolor;
+    ctx.beginPath(); ctx.arc(hx, hy, 6, 0, Math.PI * 2); ctx.fill();
+    // White centre
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(hx, hy, 2.5, 0, Math.PI * 2); ctx.fill();
+    // Label
+    ctx.font = '600 9px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(225,235,255,0.95)';
+    ctx.fillText(label, hx, hy - 14);
+    ctx.restore();
+  }
+
+  paths.forEach((p, i) => {
+    const sx = p.sx * W, sy = p.sy * H, ex = p.ex * W, ey = p.ey * H;
+    const prog = (Math.sin(time + i * 1.3) * 0.5 + 0.5);
+    const px = sx + (ex - sx) * prog, py = sy + (ey - sy) * prog;
+
+    // Drift line — medium weight, calm opacity
+    ctx.save();
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = 2.2;
+    ctx.globalAlpha = 0.55;
+    ctx.setLineDash([9, 6]);
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    // Animated particle along drift line
+    ctx.save();
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath(); ctx.arc(px, py, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    drawHub(sx, sy, p.color, p.from, i * 2.1);
+    drawHub(ex, ey, p.color, p.to,   i * 2.1 + 1.0);
+  });
+
+  // ---- REGION LABELS ----
+  // Ocean basins: small, uppercase, letter-spaced
+  // Marked seas: slightly larger, italic, softer tone
+  const regions = [
+    // Ocean basins — 8px uniform, uppercase, bright white-blue
+    [0.14, 0.28, 'NORTH PACIFIC OCEAN', 8,  false, 'rgba(210,228,255,0.95)'],
+    [0.12, 0.62, 'SOUTH PACIFIC OCEAN', 8,  false, 'rgba(200,220,255,0.92)'],
+    [0.34, 0.26, 'NORTH ATLANTIC',      8,  false, 'rgba(210,225,255,0.95)'],
+    [0.30, 0.62, 'SOUTH ATLANTIC',      8,  false, 'rgba(200,218,255,0.92)'],
+    [0.62, 0.58, 'INDIAN OCEAN',        8,  false, 'rgba(190,240,235,0.95)'],
+    [0.50, 0.04, 'ARCTIC OCEAN',        8,  false, 'rgba(220,238,255,0.92)'],
+    [0.50, 0.92, 'SOUTHERN OCEAN',      8,  false, 'rgba(205,218,245,0.92)'],
+    // Marked sea points — 10px (8+2), italic, vivid aqua/sky
+    [0.60, 0.36, 'Arabian Sea',         10, true,  'rgba(60,220,210,1.00)'],
+    [0.70, 0.37, 'Bay of Bengal',       10, true,  'rgba(50,210,200,1.00)'],
+    [0.54, 0.27, 'Mediterranean',       10, true,  'rgba(140,190,255,1.00)'],
+    [0.44, 0.49, 'Gulf of Guinea',      10, true,  'rgba(50,215,200,1.00)'],
+    [0.76, 0.28, 'South China Sea',     10, true,  'rgba(80,210,245,1.00)'],
+  ];
+
+  ctx.save();
+  regions.forEach(([fx, fy, label, fs, italic, textColor]) => {
+    const rx = fx * W, ry = fy * H;
+    // Oceans: uppercase tracking via plain font; Seas: italic medium weight
+    ctx.font = italic
+      ? `italic 500 ${fs}px "Space Grotesk", sans-serif`
+      : `600 ${fs}px "Space Grotesk", sans-serif`;
+    ctx.textAlign = 'center';
+    const tw = ctx.measureText(label).width;
+
+    // Understated pill — very dark, low opacity so map shows through
+    ctx.fillStyle = 'rgba(4,10,22,0.60)';
+    ctx.beginPath();
+    ctx.roundRect(rx - tw / 2 - 6, ry - fs - 1, tw + 12, fs + 7, 3);
+    ctx.fill();
+
+    ctx.fillStyle = textColor;
+    ctx.shadowBlur = 0;
+    ctx.fillText(label, rx, ry);
+  });
+  ctx.restore();
+
+  // ---- COMPASS ROSE ----
+  const cx = W - 50, cy = 50;
+  ctx.strokeStyle = 'rgba(0,212,255,0.5)';
+  ctx.lineWidth = 2;
+  for (let a = 0; a < 8; a++) {
+    const ang = a * Math.PI / 4;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(ang) * 18, cy + Math.sin(ang) * 18);
+    ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(0,212,255,0.9)';
+  ctx.font = 'bold 10px "JetBrains Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('N', cx, cy - 25);
+
+  animFrame = requestAnimationFrame(drawOceanMap);
+}
+
+function setMapLayer(layer, el) {
+  mapLayer = layer;
+  document.querySelectorAll('#layer-waste, #layer-current, #layer-risk').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Map clickable points — drift path hubs + risk zones
+const MAP_POINTS = [
+  // Drift path endpoints
+  { xf: 0.30, yf: 0.20, title: 'N. Atlantic Gyre Source',   tier: 'high',   predicted: '4200 kg', type: 'plastic',  wind: '7.2 m/s', current: '1.4 m/s' },
+  { xf: 0.65, yf: 0.30, title: 'Arabian Sea Convergence',   tier: 'high',   predicted: '3600 kg', type: 'mixed',    wind: '5.8 m/s', current: '1.1 m/s' },
+  { xf: 0.20, yf: 0.60, title: 'Brazil Coast Outflow',      tier: 'medium', predicted: '2100 kg', type: 'organic',  wind: '4.5 m/s', current: '0.9 m/s' },
+  { xf: 0.45, yf: 0.55, title: 'Gulf of Guinea Accumulation', tier: 'high', predicted: '3900 kg', type: 'mixed',    wind: '6.5 m/s', current: '1.1 m/s' },
+  { xf: 0.40, yf: 0.70, title: 'Mozambique Channel',        tier: 'medium', predicted: '1800 kg', type: 'marine',   wind: '3.9 m/s', current: '0.7 m/s' },
+  { xf: 0.75, yf: 0.60, title: 'Bay of Bengal Drift Zone',  tier: 'high',   predicted: '3100 kg', type: 'plastic',  wind: '6.1 m/s', current: '1.3 m/s' },
+  // Risk zones
+  { xf: 0.62, yf: 0.50, title: 'Indian Ocean Gyre',         tier: 'high',   predicted: '8500 kg', type: 'mixed',    wind: '8.4 m/s', current: '1.8 m/s' },
+  { xf: 0.44, yf: 0.48, title: 'Guinea Current Zone',       tier: 'high',   predicted: '3900 kg', type: 'plastic',  wind: '6.5 m/s', current: '1.1 m/s' },
+  { xf: 0.30, yf: 0.22, title: 'N. Atlantic Waste Belt',    tier: 'high',   predicted: '5200 kg', type: 'plastic',  wind: '9.1 m/s', current: '2.0 m/s' },
+  { xf: 0.55, yf: 0.28, title: 'Mediterranean Basin',       tier: 'medium', predicted: '2400 kg', type: 'mixed',    wind: '5.0 m/s', current: '0.8 m/s' },
+  { xf: 0.72, yf: 0.35, title: 'Arabian Sea Hotspot',       tier: 'medium', predicted: '2700 kg', type: 'organic',  wind: '5.5 m/s', current: '1.0 m/s' },
+  { xf: 0.80, yf: 0.28, title: 'South China Sea',           tier: 'low',    predicted: '1100 kg', type: 'marine',   wind: '3.2 m/s', current: '0.6 m/s' },
+];
+
+function handleMapClick(e) {
+  const canvas = document.getElementById('oceanMap');
+  const popup  = document.getElementById('map-popup');
+  if (!canvas || !popup) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+  const W  = canvas.offsetWidth;
+  const H  = canvas.offsetHeight;
+
+  // Find nearest point within 28px hit radius
+  let hit = null, minD = 28;
+  MAP_POINTS.forEach(pt => {
+    const px = pt.xf * W, py = pt.yf * H;
+    const d  = Math.sqrt((cx - px) ** 2 + (cy - py) ** 2);
+    if (d < minD) { minD = d; hit = pt; }
+  });
+
+  if (!hit) { popup.classList.remove('visible'); return; }
+
+  // Populate popup
+  document.getElementById('map-popup-title').textContent = hit.title;
+  const badge = document.getElementById('map-popup-badge');
+  badge.className = `${hit.tier}`;
+  badge.id = 'map-popup-badge';
+  document.getElementById('map-popup-tier').textContent =
+    hit.tier === 'high' ? 'High' : hit.tier === 'medium' ? 'Medium' : 'Low';
+
+  const landing = new Date(Date.now() + 3 * 3600000).toLocaleString();
+  document.getElementById('map-popup-body').innerHTML = `
+    <div>Predicted: <strong>${hit.predicted}</strong></div>
+    <div>Type: <strong>${hit.type}</strong></div>
+    <div>Landing: ${landing}</div>
+    <div>Wind: ${hit.wind}</div>
+    <div>Current: ${hit.current}</div>
+  `;
+
+  // Position popup — keep inside canvas bounds
+  const popW = 232, popH = 170;
+  let left = cx + 14, top = cy - 20;
+  if (left + popW > W) left = cx - popW - 10;
+  if (top + popH > H) top = H - popH - 8;
+  if (top < 4) top = 4;
+
+  popup.style.left = left + 'px';
+  popup.style.top  = top  + 'px';
+  popup.classList.add('visible');
+}
+
+// ==================== CHARTS ====================
+function drawPerfChart() {
+  updatePerfChart();
+}
+
+// ==================== INTERACTIVITY ====================
+function highlightZone(name) {
+  console.log('Highlighting:', name);
+}
+
+function runPrediction(event) {
+  const btn = event.target;
+  btn.innerHTML = '<span class="loading"></span> Running...';
+  btn.disabled = true;
+  setTimeout(() => { btn.innerHTML = '▶ Run Simulation'; btn.disabled = false; }, 2000);
+}
+
+// Normalize real lat/lng to 0-1 canvas fractions for the route map
+function normalizeRoutePoint(lat, lng) {
+  const LAT_MIN = 8.0, LAT_MAX = 11.0, LNG_MIN = 75.0, LNG_MAX = 81.0;
+  return [
+    (lng - LNG_MIN) / (LNG_MAX - LNG_MIN),
+    1 - (lat - LAT_MIN) / (LAT_MAX - LAT_MIN)
+  ];
+}
+
+// ---- Tamil Nadu coastal fallback routes (shown when live data not yet loaded) ----
+const FALLBACK_ROUTES = (() => {
+  const n = normalizeRoutePoint;
+  return [
+    {
+      id: 'LANE-1', color: '#00e5ff', priority: 1, vessels: 4,
+      distance: 138, time: 6, workers: 12, wasteCollected: 0,
+      stops: ['Tuticorin Port','Kilakarai','Pamban','Rameswaram','Dhanushkodi'],
+      pts: [
+        n(8.80, 78.15), n(9.23, 78.78), n(9.28, 79.20),
+        n(9.29, 79.31), n(9.16, 79.45)
+      ]
+    },
+    {
+      id: 'LANE-2', color: '#ff9100', priority: 2, vessels: 3,
+      distance: 198, time: 9, workers: 10, wasteCollected: 0,
+      stops: ['Rameswaram','Mandapam','Uchipuli','Velankanni','Nagapattinam'],
+      pts: [
+        n(9.29, 79.31), n(9.28, 79.08), n(9.32, 79.08),
+        n(10.68, 79.85), n(10.77, 79.85)
+      ]
+    },
+    {
+      id: 'LANE-3', color: '#76ff03', priority: 3, vessels: 3,
+      distance: 112, time: 5, workers: 9, wasteCollected: 0,
+      stops: ['Kanyakumari','Nagercoil','Colachel','Tuticorin Port'],
+      pts: [
+        n(8.08, 77.55), n(8.18, 77.34), n(8.18, 77.26), n(8.80, 78.15)
+      ]
+    }
+  ];
+})();
+
+// ==================== CLEANUP ROUTES ====================
+function initRouteVessels() {
+  routeVessels = {};
+  ROUTES.forEach(r => {
+    routeVessels[r.id] = Array.from({ length: r.vessels }, (_, i) => ({
+      progress: i / r.vessels,
+      speed: 0.0006 + Math.random() * 0.0003
+    }));
+  });
+}
+
+function ensureVesselsForRoute(r) {
+  if (!routeVessels[r.id]) {
+    routeVessels[r.id] = Array.from({ length: r.vessels || 3 }, (_, i) => ({
+      progress: i / (r.vessels || 3),
+      speed: 0.0006 + Math.random() * 0.0003
+    }));
+  }
+}
+
+function getPointOnPath(pts, progress, W, H) {
+  const n = pts.length - 1;
+  const seg = Math.min(n - 1, Math.floor(progress * n));
+  const t = (progress * n) - seg;
+  return {
+    x: (pts[seg][0] + (pts[seg + 1][0] - pts[seg][0]) * t) * W,
+    y: (pts[seg][1] + (pts[seg + 1][1] - pts[seg][1]) * t) * H
+  };
+}
+
+function buildRouteCards() {
+  const container = document.getElementById('route-cards-container');
+  if (!container) return;
+  const displayRoutes = ROUTES.length ? ROUTES : FALLBACK_ROUTES;
+  container.innerHTML = displayRoutes.map(r => {
+    const pClass = ['', 'p1', 'p2', 'p3'][r.priority];
+    const pLabel = `PRIORITY ${r.priority}`;
+    const isActive = r.id === selectedRoute;
+    const stops = (r.stops || []).map((s, i) =>
+      `<span class="stop-pill">${s}</span>${i < (r.stops || []).length - 1 ? '<span class="stop-arrow">›</span>' : ''}`
+    ).join('');
+    return `
+      <div class="route-card${isActive ? ' active' : ''}" onclick="selectRoute('${r.id}')">
+        <div class="route-card-header">
+          <span class="route-id" style="color:${r.color}">${r.id}</span>
+          <span class="priority-badge ${pClass}">${pLabel}</span>
+        </div>
+        <div class="route-stops">${stops}</div>
+        <div class="route-stats">
+          <div class="route-stat-item"><div class="route-stat-label">Distance</div><div class="route-stat-val">${r.distance || 0} km</div></div>
+          <div class="route-stat-item"><div class="route-stat-label">Time</div><div class="route-stat-val">${r.estimatedTime || r.time || 0}h</div></div>
+          <div class="route-stat-item"><div class="route-stat-label">Vessels</div><div class="route-stat-val">${r.vessels || 0}</div></div>
+          <div class="route-stat-item"><div class="route-stat-label">Waste</div><div class="route-stat-val">${r.wasteCollected || r.waste || 0}t</div></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateRouteStats() {
+  const displayRoutes = ROUTES.length ? ROUTES : FALLBACK_ROUTES;
+  const totalVessels = displayRoutes.reduce((s, r) => s + (r.vessels || 0), 0);
+  const totalWorkers = displayRoutes.reduce((s, r) => s + (r.workers || 0), 0);
+  const maxTime = Math.max(...displayRoutes.map(r => r.time || 0));
+  document.getElementById('r-vessels').textContent = totalVessels;
+  document.getElementById('r-workers').textContent = totalWorkers;
+  document.getElementById('r-completion').textContent = maxTime ? maxTime + 'h' : '—';
+}
+
+function selectRoute(id) {
+  selectedRoute = id;
+  buildRouteCards();
+}
+
+function drawRouteMap() {
+  const canvas = document.getElementById('routeCanvas');
+  if (!canvas || currentView !== 'routes') return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth;
+  const H = 420;
+  canvas.height = H;
+
+  // Use live data if available, otherwise fallback Tamil Nadu routes
+  const displayRoutes = ROUTES.length ? ROUTES : FALLBACK_ROUTES;
+  // Ensure vessels exist for every displayed route
+  displayRoutes.forEach(r => ensureVesselsForRoute(r));
+
+  // ---- Deep ocean background ----
+  ctx.fillStyle = '#020d1e';
+  ctx.fillRect(0, 0, W, H);
+  const seaGrad = ctx.createLinearGradient(0, 0, W, H);
+  seaGrad.addColorStop(0,   'rgba(0,30,80,0.90)');
+  seaGrad.addColorStop(0.5, 'rgba(0,18,55,0.95)');
+  seaGrad.addColorStop(1,   'rgba(0,10,35,1.00)');
+  ctx.fillStyle = seaGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle sea shimmer lines (latitude-ish parallels)
+  ctx.strokeStyle = 'rgba(0,120,200,0.07)';
+  ctx.lineWidth = 1;
+  for (let y = 0; y < H; y += 30) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  for (let x = 0; x < W; x += 35) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+
+  // ---- Tamil Nadu mainland silhouette ----
+  // Approximate east coast of India on the right edge
+  ctx.save();
+  ctx.fillStyle = 'rgba(28,60,28,0.82)';
+  ctx.strokeStyle = 'rgba(60,130,60,0.55)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  // Rough shape: right wall + southern coast down to Kanyakumari
+  const p = (lat, lng) => { const [fx, fy] = normalizeRoutePoint(lat, lng); return [fx * W, fy * H]; };
+  const coast = [
+    p(11.0, 79.9), p(10.8, 79.9), p(10.5, 79.85), p(10.2, 79.75),
+    p(10.0, 79.70), p(9.9,  79.65), p(9.7,  79.55), p(9.5,  79.40),
+    p(9.3,  79.30), p(9.1,  79.15), p(8.9,  78.90), p(8.7,  78.60),
+    p(8.5,  78.15), p(8.3,  77.85), p(8.1,  77.65), p(8.05, 77.55),
+    // Kanyakumari tip
+    p(8.08, 77.30), p(8.15, 77.10), p(8.25, 77.00), p(8.40, 77.05),
+    p(8.60, 77.20), p(8.80, 77.45), p(9.00, 77.55), p(9.20, 77.50),
+    p(9.40, 77.40), p(9.60, 77.35), p(9.80, 77.30), p(10.0, 77.30),
+    p(10.2, 77.35), p(10.4, 77.40), p(10.6, 77.45), p(10.8, 77.50),
+    p(11.0, 77.55),
+    // Close: right side
+    [W * 0.44, 0], [W * 0.44, 0]
+  ];
+  // Close left edge  (land goes to left border)
+  ctx.moveTo(0, 0);
+  ctx.lineTo(coast[coast.length - 1][0], coast[coast.length - 1][1]);
+  coast.forEach(([cx, cy]) => ctx.lineTo(cx, cy));
+  ctx.lineTo(0, H);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Sri Lanka island — simplified teardrop shape
+  ctx.beginPath();
+  const slCoast = [
+    p(9.80, 80.20), p(9.60, 80.40), p(9.40, 80.55), p(9.20, 80.65),
+    p(9.00, 80.65), p(8.70, 80.50), p(8.40, 80.10), p(8.10, 79.85),
+    p(7.95, 79.70), p(8.00, 79.50), p(8.20, 79.40), p(8.50, 79.45),
+    p(8.80, 79.60), p(9.10, 79.80), p(9.40, 80.00), p(9.65, 80.12)
+  ];
+  ctx.moveTo(slCoast[0][0], slCoast[0][1]);
+  slCoast.forEach(([cx, cy]) => ctx.lineTo(cx, cy));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(28,62,28,0.78)';
+  ctx.strokeStyle = 'rgba(60,130,60,0.50)';
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  // Palk Strait shallow-water tint
+  ctx.save();
+  const palkGrad = ctx.createRadialGradient(W * 0.58, H * 0.44, 0, W * 0.58, H * 0.44, W * 0.14);
+  palkGrad.addColorStop(0, 'rgba(0,180,210,0.14)');
+  palkGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = palkGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Gulf of Mannar tint
+  const mannarGrad = ctx.createRadialGradient(W * 0.48, H * 0.65, 0, W * 0.48, H * 0.65, W * 0.18);
+  mannarGrad.addColorStop(0, 'rgba(0,140,220,0.18)');
+  mannarGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = mannarGrad;
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+
+  // ---- Lat/lng grid overlay ----
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,180,255,0.08)';
+  ctx.lineWidth = 0.7;
+  ctx.setLineDash([3, 6]);
+  for (let lat = 8; lat <= 11; lat++) {
+    const [, fy] = normalizeRoutePoint(lat, 78);
+    const y = fy * H;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,180,255,0.30)';
+    ctx.font = '8px "JetBrains Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(lat + '°N', 3, y - 2);
+  }
+  for (let lng = 75; lng <= 81; lng++) {
+    const [fx] = normalizeRoutePoint(9, lng);
+    const x = fx * W;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,180,255,0.30)';
+    ctx.font = '8px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(lng + '°E', x, H - 3);
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Region labels on the sea
+  const seaLabels = [
+    { text: 'Gulf of Mannar', lat: 8.6,  lng: 78.9,  color: '#5cd8f5', size: 9 },
+    { text: 'Palk Bay',       lat: 9.6,  lng: 79.5,  color: '#5cd8f5', size: 9 },
+    { text: 'Palk Strait',    lat: 9.2,  lng: 79.6,  color: '#4cc8e8', size: 8 },
+    { text: 'Bay of Bengal',  lat: 10.4, lng: 80.5,  color: '#4cc8e8', size: 9 },
+  ];
+  ctx.save();
+  ctx.shadowBlur = 0;
+  seaLabels.forEach(lb => {
+    const [fx, fy] = normalizeRoutePoint(lb.lat, lb.lng);
+    const x = fx * W, y = fy * H;
+    if (x < 0 || x > W || y < 0 || y > H) return;
+    ctx.font = `italic ${lb.size}px "Space Grotesk", sans-serif`;
+    ctx.fillStyle = lb.color;
+    ctx.textAlign = 'center';
+    ctx.fillText(lb.text, x, y);
+  });
+  ctx.restore();
+
+  routeTime += 0.012;
+
+  // Draw routes (inactive first, active on top)
+  const drawOrder = [...displayRoutes].sort((a, b) => (a.id === selectedRoute ? 1 : -1));
+  drawOrder.forEach(r => {
+    const isActive = r.id === selectedRoute;
+    const pts = r.pts;
+
+    // Route path
+    ctx.save();
+    ctx.strokeStyle = r.color;
+    ctx.lineWidth = isActive ? 2.5 : 1.5;
+    ctx.globalAlpha = isActive ? 0.9 : 0.4;
+    if (!isActive) ctx.setLineDash([8, 5]);
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = p[0] * W, y = p[1] * H;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // All stop nodes with place-name labels (including first / last)
+    pts.forEach((p, i) => {
+      const x = p[0] * W, y = p[1] * H;
+      const stopName = r.stops?.[i] || '';
+      const isEndpoint = i === 0 || i === pts.length - 1;
+      const alpha = isActive ? 1 : (isEndpoint ? 0.45 : 0.55);
+      const nodeColor = isEndpoint ? '#00d4ff' : r.color;
+      const nodeSize = isActive ? (isEndpoint ? 7 : 6) : (isEndpoint ? 5 : 4);
+
+      // Glow halo
+      const hexRaw = isEndpoint ? '00d4ff' : r.color.replace('#', '');
+      const gr = parseInt(hexRaw.slice(0, 2), 16);
+      const gg = parseInt(hexRaw.slice(2, 4), 16);
+      const gb = parseInt(hexRaw.slice(4, 6), 16);
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, isActive ? 20 : 13);
+      glow.addColorStop(0, `rgba(${gr},${gg},${gb},${isActive ? 0.4 : 0.18})`);
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, isActive ? 20 : 13, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outer ring
+      ctx.beginPath();
+      ctx.arc(x, y, nodeSize + 3, 0, Math.PI * 2);
+      ctx.fillStyle = nodeColor + (isActive ? '33' : '18');
+      ctx.fill();
+
+      // Node dot
+      ctx.beginPath();
+      ctx.arc(x, y, nodeSize, 0, Math.PI * 2);
+      ctx.fillStyle = nodeColor;
+      ctx.globalAlpha = alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Place name label — solid colour, no glow/shadow
+      if (stopName) {
+        ctx.save();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur  = 0;
+        ctx.font = isActive
+          ? 'bold 11px "Space Grotesk", sans-serif'
+          : '9px "Space Grotesk", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = isEndpoint
+          ? '#a8e8ff'
+          : (isActive ? '#ffffff' : '#b0cfe0');
+        ctx.fillText(stopName, x, y - nodeSize - 7);
+        ctx.restore();
+      }
+
+      // Waste-tonnage shown as a small coloured dot ring on the node (no pill box overlay)
+      if (!isEndpoint && latestWasteData?.predictions) {
+        const pred = latestWasteData.predictions.find(p => p.landingZone === stopName);
+        if (pred && isActive) {
+          const rc = pred.riskLevel === 'HIGH' ? '#ff3366'
+                   : pred.riskLevel === 'MEDIUM' ? '#ffd600' : '#00ff88';
+          // Draw a thin coloured ring around the node to indicate risk — no box, no text overlay
+          ctx.save();
+          ctx.strokeStyle = rc;
+          ctx.lineWidth = 2;
+          ctx.globalAlpha = 0.85;
+          ctx.beginPath();
+          ctx.arc(x, y, nodeSize + 5, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    });
+
+    // (Route ID label at midpoint removed — legend panel shows IDs + colors)
+
+    // Animate vessels along route
+    if (routeVessels[r.id]) {
+      routeVessels[r.id].forEach(v => {
+        v.progress = (v.progress + v.speed) % 1;
+        const pos = getPointOnPath(pts, v.progress, W, H);
+        const alpha = isActive ? 1 : 0.55;
+
+        // Vessel glow
+        const vg = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, isActive ? 14 : 9);
+        vg.addColorStop(0, r.color + (isActive ? '55' : '22'));
+        vg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = vg;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, isActive ? 14 : 9, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Vessel dot
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, isActive ? 5 : 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.globalAlpha = alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // Inner colored dot
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, isActive ? 3 : 2, 0, Math.PI * 2);
+        ctx.fillStyle = r.color;
+        ctx.globalAlpha = alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // Vessel name + status label (active route only)
+        if (isActive && r.vessel) {
+          const vname  = r.vessel.name  || r.vessel.id || '';
+          const vstatus = r.vessel.status || '';
+          const statusColor = vstatus === 'ACTIVE' ? '#00ff88'
+                            : vstatus === 'TRANSIT' ? '#ffd600' : '#7fd7ff';
+          if (vname) {
+            ctx.save();
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+            ctx.font = 'bold 9px "Space Grotesk", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(vname, pos.x, pos.y - 14);
+            if (vstatus) {
+              ctx.font = '8px "JetBrains Mono", monospace';
+              ctx.fillStyle = statusColor;
+              ctx.fillText(vstatus, pos.x, pos.y - 5);
+            }
+            ctx.restore();
+          }
+        }
+      });
+    }
+  });
+
+  // Origin hub — pulsing node using real place name from route data
+  const depotPt  = displayRoutes[0]?.pts?.[0];
+  const depotX   = depotPt ? depotPt[0] * W : W * 0.47;
+  const depotY   = depotPt ? depotPt[1] * H : H * 0.67;
+  const depotName = (displayRoutes[0]?.stops?.[0] || 'DEPOT').toUpperCase();
+  const depotPulse = 0.65 + Math.sin(routeTime * 2) * 0.35;
+
+  // Outer pulse ring
+  ctx.beginPath();
+  ctx.arc(depotX, depotY, 28 * depotPulse, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,212,255,0.07)';
+  ctx.fill();
+
+  // Middle ring
+  ctx.beginPath();
+  ctx.arc(depotX, depotY, 16, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,212,255,0.14)';
+  ctx.fill();
+
+  // Core dot
+  ctx.beginPath();
+  ctx.arc(depotX, depotY, 10, 0, Math.PI * 2);
+  ctx.fillStyle = '#00d4ff';
+  ctx.fill();
+
+  // Origin name label — solid, no shadow
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#a8e8ff';
+  ctx.font = 'bold 11px "Space Grotesk", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(depotName, depotX, depotY + 26);
+
+  // Destination hub — shared last stop across all routes
+  const destPt   = displayRoutes[0]?.pts?.[displayRoutes[0].pts.length - 1];
+  const destX    = destPt ? destPt[0] * W : W * 0.56;
+  const destY    = destPt ? destPt[1] * H : H * 0.72;
+  const destName = (displayRoutes[0]?.stops?.[displayRoutes[0].stops.length - 1] || 'BASE').toUpperCase();
+  const destPulse = 0.65 + Math.sin(routeTime * 2 + 1.2) * 0.35;
+
+  ctx.beginPath();
+  ctx.arc(destX, destY, 24 * destPulse, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,212,255,0.07)';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(destX, destY, 10, 0, Math.PI * 2);
+  ctx.fillStyle = '#00d4ff';
+  ctx.fill();
+
+  // Destination name label — solid, no shadow
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#a8e8ff';
+  ctx.font = 'bold 11px "Space Grotesk", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(destName, destX, destY + 26);
+
+  // Route legend — top-right panel
+  {
+    const lx = W - 234, ly = 14;
+    const lw = 220, lh = 22 + displayRoutes.length * 30 + 8;
+    ctx.save();
+    ctx.fillStyle = 'rgba(2,10,26,0.86)';
+    ctx.strokeStyle = 'rgba(0,212,255,0.25)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(lx, ly, lw, lh, 6) : ctx.rect(lx, ly, lw, lh);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#a8e6ff';
+    ctx.font = 'bold 9px "JetBrains Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('CLEANUP LANES' + (ROUTES.length ? '' : ' · DEMO'), lx + 12, ly + 15);
+
+    displayRoutes.forEach((r, i) => {
+      const ey = ly + 30 + i * 30;
+      const isActive = r.id === selectedRoute;
+
+      // Color swatch
+      ctx.fillStyle = r.color;
+      ctx.globalAlpha = isActive ? 1 : 0.55;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(lx + 12, ey - 7, 22, 5, 2) : ctx.fillRect(lx + 12, ey - 7, 22, 5);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Route ID
+      ctx.fillStyle = isActive ? r.color : '#c8dff0';
+      ctx.font = isActive ? 'bold 10px "Space Grotesk", sans-serif' : '10px "Space Grotesk", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(r.id, lx + 40, ey);
+
+      // Stop path  e.g.  Tuticorin › Kilakarai › Rameswaram
+      const stopPath = (r.stops || []).join(' › ');
+      ctx.fillStyle = isActive ? '#ffffff' : 'rgba(255,255,255,0.70)';
+      ctx.font = '8px "JetBrains Mono", monospace';
+      ctx.fillText(stopPath.length > 30 ? stopPath.slice(0, 29) + '…' : stopPath, lx + 40, ey + 12);
+    });
+    ctx.restore();
+  }
+
+  // Re-optimize flash effect
+  if (isReOptimizing) {
+    ctx.fillStyle = 'rgba(0,212,255,0.04)';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  routeAnimFrame = requestAnimationFrame(drawRouteMap);
+}
+
+async function reOptimizeRoutes(event) {
+  const btn = event.target;
+  btn.innerHTML = '<span class="loading"></span> Optimizing...';
+  btn.disabled = true;
+  isReOptimizing = true;
+
+  await new Promise(r => setTimeout(r, 1800));
+
+  // Slightly vary route distances to simulate re-optimization
+  ROUTES.forEach(r => {
+    r.distance = Math.round(r.distance * (0.92 + Math.random() * 0.12));
+    r.time = Math.round(r.time * (0.92 + Math.random() * 0.12) * 10) / 10;
+  });
+
+  isReOptimizing = false;
+  buildRouteCards();
+  updateRouteStats();
+  btn.innerHTML = '⚡ Re-Optimize All Routes';
+  btn.disabled = false;
+}
+
+// ==================== DRIFT PREDICTION ====================
+function initDriftParticles() {
+  const canvas = document.getElementById('driftCanvas');
+  if (!canvas) return;
+  const W = canvas.offsetWidth || 700;
+  const H = 400;
+  driftParticles = [];
+  for (let i = 0; i < 75; i++) {
+    driftParticles.push(makeDriftParticle(W, H, true));
+  }
+}
+
+function makeDriftParticle(W, H, scatter) {
+  return {
+    x: scatter ? Math.random() * W * 0.75 : 0,
+    y: Math.random() * H,
+    vy: 0,
+    trail: [],
+    size: Math.random() * 2.5 + 1.5,
+    phase: Math.random() * Math.PI * 2,
+    speedMult: 0.75 + Math.random() * 0.5
+  };
+}
+
+function getDriftBaseSpeed() {
+  return (predParams.currentSpeed * 0.55 + predParams.windSpeed * 0.022 + predParams.tideAmplitude * 0.18) * 0.9;
+}
+
+function drawDriftCanvas() {
+  const canvas = document.getElementById('driftCanvas');
+  if (!canvas || currentView !== 'prediction') return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth;
+  const H = 400;
+  canvas.height = H;
+  const shoreX = W * 0.83;
+
+  // Background
+  ctx.fillStyle = '#020a14';
+  ctx.fillRect(0, 0, W, H);
+  const bgGrad = ctx.createLinearGradient(0, 0, W, 0);
+  bgGrad.addColorStop(0, 'rgba(0,25,70,0.45)');
+  bgGrad.addColorStop(0.75, 'rgba(0,15,50,0.3)');
+  bgGrad.addColorStop(1, 'rgba(30,18,5,0.5)');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Shore tint
+  const shoreGrad = ctx.createLinearGradient(shoreX - 100, 0, W, 0);
+  shoreGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  shoreGrad.addColorStop(0.4, 'rgba(45,28,8,0.25)');
+  shoreGrad.addColorStop(1, 'rgba(65,42,10,0.45)');
+  ctx.fillStyle = shoreGrad;
+  ctx.fillRect(shoreX - 100, 0, W - shoreX + 100, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,212,255,0.055)';
+  ctx.lineWidth = 0.8;
+  for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+  driftTime += 0.018;
+  const baseSpeed = getDriftBaseSpeed();
+
+  // Particles
+  for (let i = 0; i < driftParticles.length; i++) {
+    const p = driftParticles[i];
+    p.vy = Math.sin(driftTime + p.phase) * 0.45;
+    const vx = baseSpeed * p.speedMult;
+
+    p.trail.push({ x: p.x, y: p.y });
+    if (p.trail.length > 20) p.trail.shift();
+    p.x += vx;
+    p.y += p.vy;
+    if (p.y < 0) p.y = H;
+    if (p.y > H) p.y = 0;
+
+    if (p.x >= shoreX) {
+      Object.assign(p, makeDriftParticle(W, H, false));
+      p.trail = [];
+      continue;
+    }
+
+    // Color: cyan → yellow → red as particle approaches shore
+    const t = Math.min(1, p.x / shoreX);
+    let r, g, b;
+    if (t < 0.5) {
+      const tt = t * 2;
+      r = Math.round(255 * tt);
+      g = Math.round(212 + 2 * tt);
+      b = Math.round(255 * (1 - tt));
+    } else {
+      const tt = (t - 0.5) * 2;
+      r = 255;
+      g = Math.round(214 * (1 - tt));
+      b = Math.round(102 * tt);
+    }
+
+    // Trail
+    for (let j = 1; j < p.trail.length; j++) {
+      const alpha = (j / p.trail.length) * 0.65;
+      ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.lineWidth = p.size * (j / p.trail.length) * 1.2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(p.trail[j - 1].x, p.trail[j - 1].y);
+      ctx.lineTo(p.trail[j].x, p.trail[j].y);
+      ctx.stroke();
+    }
+
+    // Head
+    ctx.fillStyle = `rgba(${r},${g},${b},0.95)`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Glow
+    const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 5);
+    glow.addColorStop(0, `rgba(${r},${g},${b},0.25)`);
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ---- Drift physics (live from predParams) ----
+  const northPush  = Math.max(-0.4, Math.min(0.4, (predParams.currentSpeed - 3) * 0.06 - predParams.windSpeed * 0.003));
+  const driftSpeed = predParams.currentSpeed * 0.8 + predParams.windSpeed * 0.04 + predParams.tideAmplitude * 0.25;
+  const speedKmh   = Math.max(0.5, driftSpeed * 1.852);
+
+  // Tamil Nadu coastal landing zones — top=north, bottom=south
+  const coastZones = [
+    { name: 'Nagapattinam', y: 0.05, lat: 10.77, lng: 79.84, risk: 'HIGH'   },
+    { name: 'Velankanni',   y: 0.14, lat: 10.68, lng: 79.85, risk: 'HIGH'   },
+    { name: 'Karaikal',     y: 0.22, lat: 10.92, lng: 79.83, risk: 'MEDIUM' },
+    { name: 'Pamban Island',y: 0.35, lat:  9.28, lng: 79.21, risk: 'MEDIUM' },
+    { name: 'Rameswaram',   y: 0.44, lat:  9.29, lng: 79.31, risk: 'HIGH'   },
+    { name: 'Mandapam',     y: 0.52, lat:  9.28, lng: 79.12, risk: 'MEDIUM' },
+    { name: 'Tuticorin',    y: 0.63, lat:  8.80, lng: 78.15, risk: 'MEDIUM' },
+    { name: 'Thiruchendur', y: 0.74, lat:  8.49, lng: 78.12, risk: 'LOW'    },
+    { name: 'Kanyakumari',  y: 0.90, lat:  8.08, lng: 77.55, risk: 'LOW'    },
+  ];
+
+  // Ocean waste source zones
+  const driftSources = [
+    { label: 'BAY OF\nBENGAL',   xF: 0.07, yF: 0.17, color: '#ff3366', baseIdx: 1, tonFrac: 0.45 },
+    { label: 'INDIAN\nOCEAN',    xF: 0.07, yF: 0.58, color: '#ffd600', baseIdx: 6, tonFrac: 0.35 },
+    { label: 'SRI LANKA\nCHANNEL', xF: 0.24, yF: 0.42, color: '#00ff88', baseIdx: 4, tonFrac: 0.20 },
+  ];
+
+  const clampIdx = (v) => Math.max(0, Math.min(coastZones.length - 1, v));
+  const idxShift  = Math.round(northPush * 10);
+  const srcTargets = driftSources.map(s => clampIdx(s.baseIdx - idxShift));
+
+  // ---- Draw ocean source zone labels ----
+  driftSources.forEach((src, si) => {
+    const sx2 = src.xF * W, sy2 = src.yF * H;
+    const pulse = 0.5 + Math.sin(driftTime * 2.2 + si * 2.1) * 0.3;
+
+    // Pulsing outer ring
+    ctx.save();
+    ctx.globalAlpha = 0.22 + pulse * 0.22;
+    ctx.strokeStyle = src.color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(sx2, sy2, 18 + pulse * 6, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Inner glow
+    const grd = ctx.createRadialGradient(sx2, sy2, 0, sx2, sy2, 22);
+    grd.addColorStop(0, src.color + '44'); grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath(); ctx.arc(sx2, sy2, 22, 0, Math.PI * 2); ctx.fill();
+
+    // Core dot
+    ctx.fillStyle = src.color;
+    ctx.beginPath(); ctx.arc(sx2, sy2, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(sx2, sy2, 2.5, 0, Math.PI * 2); ctx.fill();
+
+    // Label pill
+    const lines = src.label.split('\n');
+    ctx.font = 'bold 8px "Space Grotesk", sans-serif';
+    const maxLineW = Math.max(...lines.map(l => ctx.measureText(l).width));
+    const pillW = maxLineW + 16, pillH = lines.length * 12 + 6;
+    const pillX = sx2 - pillW / 2, pillY = sy2 - 30 - pillH;
+    ctx.fillStyle = 'rgba(0,8,20,0.85)';
+    ctx.strokeStyle = src.color + '99';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(pillX, pillY, pillW, pillH, 4);
+    else ctx.rect(pillX, pillY, pillW, pillH);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = src.color;
+    ctx.textAlign = 'center';
+    lines.forEach((line, li) => ctx.fillText(line, sx2, pillY + 11 + li * 12));
+    ctx.restore();
+  });
+
+  // ---- Draw curved drift trajectory paths ----
+  driftSources.forEach((src, si) => {
+    const tIdx = srcTargets[si];
+    const zone = coastZones[tIdx];
+    const isPrimary = si === 0;
+    const sx2 = src.xF * W, sy2 = src.yF * H;
+    const ex = shoreX - 3, ey = zone.y * H;
+    const cpx = (sx2 + ex) * 0.52;
+    const cpy = sy2 + (ey - sy2) * 0.5 - northPush * H * 0.12;
+
+    // Animated particle along bezier
+    const tProgress = (Math.sin(driftTime * 0.75 + si * 1.6) * 0.5 + 0.5);
+    const inv = 1 - tProgress;
+    const px2 = inv * inv * sx2 + 2 * inv * tProgress * cpx + tProgress * tProgress * ex;
+    const py2 = inv * inv * sy2 + 2 * inv * tProgress * cpy + tProgress * tProgress * ey;
+
+    const tons = Math.round(predParams.wasteDensity * src.tonFrac);
+    const distKm = src.xF * 220 + Math.abs(zone.y - src.yF) * 90;
+    const etaH   = Math.max(1, Math.round(distKm / speedKmh));
+
+    // Bezier path
+    ctx.save();
+    ctx.setLineDash(isPrimary ? [10, 4] : [5, 6]);
+    ctx.strokeStyle = src.color;
+    ctx.lineWidth = isPrimary ? 2.5 : 1.5;
+    ctx.globalAlpha = isPrimary ? 0.80 : 0.45;
+    ctx.beginPath(); ctx.moveTo(sx2, sy2); ctx.quadraticCurveTo(cpx, cpy, ex, ey); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+
+    // Moving particle
+    const gp2 = ctx.createRadialGradient(px2, py2, 0, px2, py2, 20);
+    gp2.addColorStop(0, src.color + '55'); gp2.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gp2;
+    ctx.beginPath(); ctx.arc(px2, py2, 20, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = src.color;
+    ctx.beginPath(); ctx.arc(px2, py2, isPrimary ? 6 : 4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(px2, py2, isPrimary ? 3 : 2, 0, Math.PI * 2); ctx.fill();
+
+    // Mid-path tag (primary only)
+    if (isPrimary) {
+      const mt = 0.48;
+      const mx2 = (1-mt)*(1-mt)*sx2 + 2*(1-mt)*mt*cpx + mt*mt*ex;
+      const my2 = (1-mt)*(1-mt)*sy2 + 2*(1-mt)*mt*cpy + mt*mt*ey - 16;
+      const tag = `${tons}t · ETA T+${etaH}h`;
+      ctx.font = 'bold 8px "JetBrains Mono", monospace';
+      const tw = ctx.measureText(tag).width + 14;
+      ctx.fillStyle = 'rgba(0,8,20,0.88)';
+      ctx.strokeStyle = src.color + 'aa'; ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(mx2 - tw/2, my2 - 6, tw, 13, 3);
+      else ctx.rect(mx2 - tw/2, my2 - 6, tw, 13);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = src.color;
+      ctx.textAlign = 'center';
+      ctx.fillText(tag, mx2, my2 + 4);
+    }
+    ctx.restore();
+  });
+
+  // ---- Shoreline (wavy) ----
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,138,20,0.65)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 5]);
+  ctx.beginPath();
+  for (let y = 0; y <= H; y += 3) {
+    const wavX = shoreX + Math.sin(y * 0.028 + driftTime * 0.6) * 8;
+    y === 0 ? ctx.moveTo(wavX, y) : ctx.lineTo(wavX, y);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // ---- Coast zone markers + labels ----
+  coastZones.forEach((z, zi) => {
+    const zy  = z.y * H;
+    const zwx = shoreX + Math.sin(zy * 0.028 + driftTime * 0.6) * 8;
+    const rc  = z.risk === 'HIGH' ? '#ff3366' : z.risk === 'MEDIUM' ? '#ffd600' : '#00ff88';
+    const isTgt    = srcTargets.includes(zi);
+    const isPrimTgt = srcTargets[0] === zi;
+    const srcIdx   = srcTargets.indexOf(zi);
+
+    // Pulsing ring + glow band for target zones
+    if (isTgt) {
+      const pulseR = (isPrimTgt ? 13 : 8) + Math.sin(driftTime * 2.4 + zi) * (isPrimTgt ? 5 : 3);
+      ctx.save();
+      ctx.globalAlpha = 0.30 + Math.sin(driftTime * 2.4 + zi) * 0.15;
+      ctx.strokeStyle = rc; ctx.lineWidth = isPrimTgt ? 2 : 1.2;
+      ctx.beginPath(); ctx.arc(zwx, zy, pulseR, 0, Math.PI * 2); ctx.stroke();
+      // Glow band on land
+      const glowG = ctx.createLinearGradient(shoreX, 0, W, 0);
+      glowG.addColorStop(0, rc + (isPrimTgt ? '28' : '15'));
+      glowG.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glowG;
+      const bh = isPrimTgt ? 22 : 15;
+      ctx.fillRect(shoreX, zy - bh, W - shoreX, bh * 2);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
+    // Shore dot
+    ctx.save();
+    ctx.globalAlpha = isTgt ? 1 : 0.38;
+    ctx.fillStyle = rc;
+    ctx.beginPath(); ctx.arc(zwx, zy, isTgt ? (isPrimTgt ? 6 : 4.5) : 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(zwx, zy, isTgt ? (isPrimTgt ? 2.8 : 2) : 1.2, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // Zone label — no effects, solid colours only
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur  = 0;
+    ctx.shadowColor = 'transparent';
+
+    // Zone name
+    ctx.font      = isPrimTgt ? 'bold 11px "Space Grotesk", sans-serif'
+                  : isTgt     ? 'bold 10px "Space Grotesk", sans-serif'
+                              : '9.5px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = isPrimTgt ? '#ffffff'
+                  : isTgt     ? rc
+                              : '#c8dff0';
+    ctx.fillText(z.name, zwx + 9, zy + 4);
+
+    if (isTgt && srcIdx >= 0) {
+      const src    = driftSources[srcIdx];
+      const tons   = Math.round(predParams.wasteDensity * src.tonFrac);
+      const distKm = src.xF * 220 + Math.abs(z.y - src.yF) * 90;
+      const etaH   = Math.max(1, Math.round(distKm / speedKmh));
+
+      // Coordinates
+      ctx.font      = '8px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#90d8f8';
+      ctx.fillText(`${z.lat.toFixed(2)}°N  ${z.lng.toFixed(2)}°E`, zwx + 9, zy + 15);
+
+      // Badge background + border
+      const badge = `${tons}t · T+${etaH}h`;
+      ctx.font = 'bold 8px "JetBrains Mono", monospace';
+      const bw = ctx.measureText(badge).width + 12;
+      ctx.fillStyle   = 'rgba(0,6,18,0.92)';
+      ctx.strokeStyle = rc;
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(zwx + 9, zy + 18, bw, 13, 3);
+      else ctx.rect(zwx + 9, zy + 18, bw, 13);
+      ctx.fill();
+      ctx.stroke();
+      // Badge text
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(badge, zwx + 15, zy + 28);
+    }
+    ctx.restore();
+  });
+
+  // Coast header
+  ctx.save();
+  ctx.fillStyle   = '#ffcc66';
+  ctx.font        = 'bold 9px "JetBrains Mono", monospace';
+  ctx.textAlign   = 'center';
+  ctx.shadowBlur  = 0;
+  ctx.fillText('TAMIL NADU COAST', shoreX + (W - shoreX) / 2, 13);
+  ctx.restore();
+
+  // Vector legend — bottom-left corner, clear of drift paths
+  drawVectorDiagram(ctx, W, H);
+
+  driftAnimFrame = requestAnimationFrame(drawDriftCanvas);
+}
+
+function drawVectorDiagram(ctx, W, H) {
+  const currentComp = predParams.currentSpeed * 0.8;
+  const windComp    = predParams.windSpeed * 0.04;
+  const tideComp    = predParams.tideAmplitude * 0.25;
+  const netMag      = currentComp + windComp + tideComp;
+
+  // ---- Panel geometry — anchored bottom-left ----
+  const PAD   = 12;   // margin from canvas edge
+  const PW    = 168;  // panel width
+  const ROW_H = 22;   // height per row
+  const ROWS  = 4;    // Current, Wind, Tide, Net
+  const PH    = 18 + ROWS * ROW_H + 10;  // panel height
+  const px    = PAD;                     // panel left
+  const py    = H - PAD - PH;           // panel top (anchored to bottom)
+
+  // Panel background — darker + stronger border so text pops
+  ctx.save();
+  ctx.fillStyle   = 'rgba(1,5,16,0.95)';
+  ctx.strokeStyle = 'rgba(0,212,255,0.55)';
+  ctx.lineWidth   = 1.2;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(px, py, PW, PH, 6);
+  else ctx.rect(px, py, PW, PH);
+  ctx.fill();
+  ctx.stroke();
+
+  // Panel title — bright, fully opaque, no shadow
+  ctx.fillStyle   = '#a8e6ff';
+  ctx.font        = 'bold 9px "JetBrains Mono", monospace';
+  ctx.textAlign   = 'left';
+  ctx.shadowBlur  = 0;
+  ctx.fillText('DRIFT FORCE VECTORS', px + 10, py + 13);
+
+  // Separator line under title
+  ctx.strokeStyle = 'rgba(0,212,255,0.25)';
+  ctx.lineWidth   = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(px + 8, py + 17); ctx.lineTo(px + PW - 8, py + 17);
+  ctx.stroke();
+
+  // ---- Draw each vector row ----
+  const vectors = [
+    { label: 'Current', value: currentComp, unit: 'kt', color: '#40e0ff', angle: 0              },
+    { label: 'Wind',    value: windComp,    unit: 'kt', color: '#50ffaa', angle: -Math.PI / 6   },
+    { label: 'Tide',    value: tideComp,    unit: 'kt', color: '#ffe044', angle:  Math.PI / 8   },
+    { label: 'Σ Net',   value: netMag,      unit: 'kt', color: '#ff6688', angle: -Math.PI / 8, bold: true },
+  ];
+
+  const ARROW_COL_X = px + 10;
+  const ARROW_LEN   = 38;
+  const LABEL_X     = px + 57;
+  const VAL_X       = px + PW - 9;
+
+  vectors.forEach((v, i) => {
+    const rowY = py + 20 + i * ROW_H;
+    const midY = rowY + ROW_H / 2;
+    const frac = Math.min(1, v.value / Math.max(netMag, 0.01));
+    const aLen = Math.max(7, Math.round(frac * ARROW_LEN));
+
+    // Divider before Net row
+    if (i === 3) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth   = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(px + 8, rowY); ctx.lineTo(px + PW - 8, rowY);
+      ctx.stroke();
+    }
+
+    // Arrow shaft
+    const ax1 = ARROW_COL_X;
+    const ay1 = midY;
+    const ax2 = ax1 + Math.cos(v.angle) * aLen;
+    const ay2 = ay1 + Math.sin(v.angle) * aLen;
+
+    ctx.strokeStyle = v.color;
+    ctx.fillStyle   = v.color;
+    ctx.lineWidth   = v.bold ? 2.8 : 2;
+    ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.moveTo(ax1, ay1); ctx.lineTo(ax2, ay2); ctx.stroke();
+
+    // Arrowhead
+    const ang   = Math.atan2(ay2 - ay1, ax2 - ax1);
+    const hSize = v.bold ? 7.5 : 6;
+    ctx.beginPath();
+    ctx.moveTo(ax2, ay2);
+    ctx.lineTo(ax2 - Math.cos(ang - 0.4) * hSize, ay2 - Math.sin(ang - 0.4) * hSize);
+    ctx.lineTo(ax2 - Math.cos(ang + 0.4) * hSize, ay2 - Math.sin(ang + 0.4) * hSize);
+    ctx.closePath(); ctx.fill();
+
+    // Label — solid, no shadow
+    ctx.font        = v.bold ? 'bold 10.5px "Space Grotesk", sans-serif' : 'bold 10px "Space Grotesk", sans-serif';
+    ctx.textAlign   = 'left';
+    ctx.fillStyle   = v.bold ? v.color : '#e8f4ff';
+    ctx.shadowBlur  = 0;
+    ctx.fillText(v.label, LABEL_X, midY + 4);
+
+    // Value — vector color, monospace, right-aligned, solid
+    ctx.font        = v.bold ? 'bold 10px "JetBrains Mono", monospace' : '9.5px "JetBrains Mono", monospace';
+    ctx.textAlign   = 'right';
+    ctx.fillStyle   = v.color;
+    ctx.fillText(`${v.value.toFixed(2)} ${v.unit}`, VAL_X, midY + 4);
+  });
+
+  ctx.restore();
+}
+
+function updatePredParam(param, value) {
+  predParams[param] = parseFloat(value);
+  const labels = {
+    currentSpeed: v => `${parseFloat(v).toFixed(1)} knots`,
+    windSpeed: v => `${Math.round(v)} km/h`,
+    tideAmplitude: v => `${parseFloat(v).toFixed(1)} m`,
+    wasteDensity: v => `${Math.round(v)} tons`,
+    forecastWindow: v => `${Math.round(v)} hours`
+  };
+  document.getElementById('p-' + param).textContent = labels[param](value);
+  recalcPrediction();
+  updateTrajectoryChart();
+}
+
+function recalcPrediction() {
+  const { currentSpeed, windSpeed, tideAmplitude } = predParams;
+  const currentComp = currentSpeed * 0.8;
+  const windComp    = windSpeed * 0.04;
+  const tideComp    = tideAmplitude * 0.25;
+  const netSpeed    = currentComp + windComp + tideComp;
+  const speedKmh    = Math.max(0.5, netSpeed * 1.852);
+  const netDeg      = Math.max(30, Math.min(89, Math.round(50 + (currentSpeed - windSpeed * 0.08) * 1.5)));
+  const confidence  = Math.min(98, Math.max(60, Math.round(80 + currentSpeed * 2 - Math.abs(windSpeed - 15) * 0.3)));
+
+  // Same drift physics as canvas — pick primary landing zone
+  const northPush = Math.max(-0.4, Math.min(0.4, (currentSpeed - 3) * 0.06 - windSpeed * 0.003));
+  const idxShift  = Math.round(northPush * 10);
+  const coastZones = [
+    { name: 'Nagapattinam', y: 0.05, lat: 10.77, lng: 79.84 },
+    { name: 'Velankanni',   y: 0.14, lat: 10.68, lng: 79.85 },
+    { name: 'Karaikal',     y: 0.22, lat: 10.92, lng: 79.83 },
+    { name: 'Pamban Island',y: 0.35, lat:  9.28, lng: 79.21 },
+    { name: 'Rameswaram',   y: 0.44, lat:  9.29, lng: 79.31 },
+    { name: 'Mandapam',     y: 0.52, lat:  9.28, lng: 79.12 },
+    { name: 'Tuticorin',    y: 0.63, lat:  8.80, lng: 78.15 },
+    { name: 'Thiruchendur', y: 0.74, lat:  8.49, lng: 78.12 },
+    { name: 'Kanyakumari',  y: 0.90, lat:  8.08, lng: 77.55 },
+  ];
+  const primaryBaseIdx = 1; // Bay of Bengal → default Velankanni
+  const primaryIdx = Math.max(0, Math.min(coastZones.length - 1, primaryBaseIdx - idxShift));
+  const primaryZone = coastZones[primaryIdx];
+
+  // ETA for primary path (Bay of Bengal source at xF=0.07, yF=0.17)
+  const distKm = 0.07 * 220 + Math.abs(primaryZone.y - 0.17) * 90;
+  const etaH   = Math.max(1, Math.round(distKm / speedKmh));
+
+  document.getElementById('pred-zone').textContent = primaryZone.name;
+  const coordEl = document.querySelector('#view-prediction [style*="12.3"]') ||
+                  document.querySelector('#view-prediction .pred-coord');
+  if (coordEl) coordEl.textContent = `${primaryZone.lat.toFixed(2)}°N, ${primaryZone.lng.toFixed(2)}°E`;
+
+  document.getElementById('pred-timeimpact').textContent = `T+${etaH}h`;
+  document.getElementById('pred-confidence').textContent = `${confidence}%`;
+  document.getElementById('pred-current-vec').textContent = `+${currentComp.toFixed(1)} kt NE`;
+  document.getElementById('pred-wind-vec').textContent    = `+${windComp.toFixed(2)} kt E`;
+  document.getElementById('pred-tide-vec').textContent    = `+${tideComp.toFixed(2)} kt shore`;
+  document.getElementById('pred-net-vec').textContent     = `${netSpeed.toFixed(1)} kt · ${netDeg.toString().padStart(3,'0')}°`;
+}
+
+function setTrajWindow(w, el) {
+  currentTrajWindow = w;
+  document.querySelectorAll('#view-prediction .time-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  updateTrajectoryChart();
+}
+
+function getTrajData(window) {
+  const { wasteDensity, currentSpeed, tideAmplitude } = predParams;
+  const netSpeed = currentSpeed * 0.8 + predParams.windSpeed * 0.04 + tideAmplitude * 0.25;
+  const peakHour = Math.max(2, Math.round(30 / netSpeed));
+  const configs = {
+    '+6h':  { pts: [1,2,3,4,5,6] },
+    '+12h': { pts: [2,4,6,8,10,12] },
+    '+24h': { pts: [4,8,12,16,20,24] },
+    '+48h': { pts: [8,16,24,32,40,48] }
+  };
+  const pts = configs[window].pts;
+  const sigma = Math.max(2, peakHour * 0.7);
+  return {
+    labels: pts.map(h => `T+${h}h`),
+    arrival: pts.map(h => Math.max(0, Math.round(wasteDensity * Math.exp(-Math.pow(h - peakHour, 2) / (2 * sigma * sigma)) * (0.88 + Math.random() * 0.24)))),
+    capacity: pts.map(() => Math.round(wasteDensity * 0.55))
+  };
+}
+
+function drawTrajectoryChart() {
+  const canvas = document.getElementById('trajectoryChart');
+  if (!canvas) return;
+  const { labels, arrival, capacity } = getTrajData(currentTrajWindow);
+
+  if (trajChartInst) {
+    trajChartInst.data.labels = labels;
+    trajChartInst.data.datasets[0].data = arrival;
+    trajChartInst.data.datasets[1].data = capacity;
+    trajChartInst.update('none');
+    return;
+  }
+
+  trajChartInst = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Waste Arrival (tons)',
+          data: arrival,
+          borderColor: '#ff3366',
+          backgroundColor: 'rgba(255,51,102,0.12)',
+          fill: true, tension: 0.4,
+          pointRadius: 5, borderWidth: 2.5,
+          pointBackgroundColor: '#ff3366',
+          pointBorderColor: '#fff', pointBorderWidth: 1.5
+        },
+        {
+          label: 'Vessel Capacity',
+          data: capacity,
+          borderColor: '#00d4ff',
+          borderDash: [6, 4],
+          backgroundColor: 'transparent',
+          tension: 0, pointRadius: 0, borderWidth: 1.5
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#7eb8d4', font: { size: 11, weight: '600' } } } },
+      scales: {
+        x: { ticks: { color: '#7eb8d4', font: { size: 10 } }, grid: { color: 'rgba(0,212,255,0.08)' } },
+        y: { ticks: { color: '#7eb8d4', font: { size: 10 } }, grid: { color: 'rgba(0,212,255,0.08)' } }
+      }
+    }
+  });
+}
+
+function updateTrajectoryChart() {
+  if (!trajChartInst) return;
+  const { labels, arrival, capacity } = getTrajData(currentTrajWindow);
+  trajChartInst.data.labels = labels;
+  trajChartInst.data.datasets[0].data = arrival;
+  trajChartInst.data.datasets[1].data = capacity;
+  trajChartInst.update('none');
+}
+
+// ==================== INIT ====================
+window.addEventListener('load', () => {
+  worldMapImage.crossOrigin = 'anonymous';
+  worldMapImage.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/2000px-World_map_-_low_resolution.svg.png';
+  worldMapImage.onload = () => {
+    worldMapLoaded = true;
+    drawOceanMap();
+  };
+
+  initializeSocket();
+  switchView('login');
+  drawOceanMap();
+  drawPerfChart();
+  drawTrajectoryChart();
+  
+  // Auto-refresh data every 30 seconds
+  setInterval(() => {
+    if (isConnected && currentView !== 'login') {
+      fetchDashboardStats();
+      fetchEnvironmentalData();
+      fetchWasteLatest();
+      fetchOperationsStatus();
+      fetchMarineData();
+      fetchAirQualityData();
+      fetchStorms();
+      fetchTidalData();
+      fetchWasteReports();
+      if (currentView === 'aimodel') fetchModelMetrics();
+      if (currentView === 'datasources') fetchDataSources();
+    }
+  }, 30000);
+});
+
+window.addEventListener('resize', () => {
+  drawOceanMap();
+});
+</script>
+</body>
+</html>

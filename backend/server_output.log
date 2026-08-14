@@ -1,0 +1,474 @@
+[dotenv@17.3.1] injecting env (3) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+Server running on port 5000
+Connected to MongoDB
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+Client connected: pxUgJM49GAxH3giEAAAB
+[ingest] Air quality: AQI 50 (Moderate), PM10 22.6, PM2.5 20.4
+[ingest] Marine: 3 readings saved.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Air quality: AQI 50 (Moderate), PM10 22.6, PM2.5 20.4
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client connected: --Nm6tghTjAimwOXAAAD
+Client disconnected: --Nm6tghTjAimwOXAAAD
+Client connected: _Uv_ylA9e1J0nt_UAAAF
+Client disconnected: _Uv_ylA9e1J0nt_UAAAF
+Client connected: 3TqJSdresW_33nuVAAAH
+Client disconnected: pxUgJM49GAxH3giEAAAB
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 50 (Moderate), PM10 22.6, PM2.5 20.4
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] Air quality: AQI 50 (Moderate), PM10 22.6, PM2.5 20.4
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: 3TqJSdresW_33nuVAAAH
+[ingest] Full data ingestion starting…
+[ingest] Weather/Waste error: getaddrinfo ENOTFOUND api.open-meteo.com
+[ingest] Air quality error: getaddrinfo ENOTFOUND air-quality-api.open-meteo.com
+[ingest] Marine: 0 readings saved.
+[ingest] Storm events error: getaddrinfo ENOTFOUND eonet.gsfc.nasa.gov
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] All datasets processed.
+Client connected: TUCjR3vfUwVrXyTHAAAJ
+Client disconnected: TUCjR3vfUwVrXyTHAAAJ
+[ingest] Full data ingestion starting…
+[ingest] Weather/Waste error: getaddrinfo ENOTFOUND api.open-meteo.com
+[ingest] Marine: 0 readings saved.
+[ingest] Air quality error: getaddrinfo ENOTFOUND air-quality-api.open-meteo.com
+[ingest] Storm events error: getaddrinfo ENOTFOUND eonet.gsfc.nasa.gov
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] All datasets processed.
+Client connected: cFLZJ0WPWdPpNNqDAAAL
+Client connected: 0r41IQlUze00OASTAAAN
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Air quality: AQI 47 (Moderate), PM10 28.5, PM2.5 26.4
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 47 (Moderate), PM10 28.5, PM2.5 26.4
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: 0r41IQlUze00OASTAAAN
+Client disconnected: cFLZJ0WPWdPpNNqDAAAL
+Client connected: P-PH_BsRrICyyUsQAAAP
+Client connected: Q97pHFgdlzRiox4FAAAR
+Client disconnected: Q97pHFgdlzRiox4FAAAR
+Client disconnected: P-PH_BsRrICyyUsQAAAP
+[ingest] Full data ingestion starting…
+[ingest] Weather/Waste error: getaddrinfo ENOTFOUND api.open-meteo.com
+[ingest] Marine: 0 readings saved.
+[ingest] Air quality error: getaddrinfo ENOTFOUND air-quality-api.open-meteo.com
+[ingest] Storm events error: getaddrinfo ENOTFOUND eonet.gsfc.nasa.gov
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] All datasets processed.
+Client connected: i_qB_U_uuJTFggZcAAAT
+Client connected: 34QlBHo9Ma-Ctt6VAAAV
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Air quality: AQI 43 (Moderate), PM10 30.9, PM2.5 28.9
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Air quality: AQI 43 (Moderate), PM10 30.9, PM2.5 28.9
+[ingest] Marine: 3 readings saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: i_qB_U_uuJTFggZcAAAT
+Client disconnected: 34QlBHo9Ma-Ctt6VAAAV
+[ingest] Full data ingestion starting…
+[ingest] Weather/Waste error: getaddrinfo ENOTFOUND api.open-meteo.com
+[ingest] Marine: 0 readings saved.
+[ingest] Air quality error: getaddrinfo ENOTFOUND air-quality-api.open-meteo.com
+[ingest] Storm events error: getaddrinfo ENOTFOUND eonet.gsfc.nasa.gov
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] All datasets processed.
+Client connected: fvZ9vQE4goWVN_J-AAAX
+Client disconnected: fvZ9vQE4goWVN_J-AAAX
+Client connected: uypP_PNOVSIY4W1wAAAZ
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 43 (Moderate), PM10 30.9, PM2.5 28.9
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Air quality: AQI 43 (Moderate), PM10 30.9, PM2.5 28.9
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 43 (Moderate), PM10 30.9, PM2.5 28.9
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: uypP_PNOVSIY4W1wAAAZ
+[ingest] Full data ingestion starting…
+[ingest] Weather/Waste error: getaddrinfo ENOTFOUND api.open-meteo.com
+[ingest] Marine: 0 readings saved.
+[ingest] Air quality error: getaddrinfo ENOTFOUND air-quality-api.open-meteo.com
+[ingest] Storm events error: getaddrinfo ENOTFOUND eonet.gsfc.nasa.gov
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] All datasets processed.
+Client connected: oCVhQvtVIwdoDy92AAAb
+Client disconnected: oCVhQvtVIwdoDy92AAAb
+[ingest] Full data ingestion starting…
+[ingest] Weather/Waste error: getaddrinfo ENOTFOUND api.open-meteo.com
+[ingest] Marine: 0 readings saved.
+[ingest] Air quality error: getaddrinfo ENOTFOUND air-quality-api.open-meteo.com
+[ingest] Storm events error: getaddrinfo ENOTFOUND eonet.gsfc.nasa.gov
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] All datasets processed.
+Client connected: 6Qqpelnlm01ucwOiAAAd
+Client connected: 6zbEVz5ogZtixoIZAAAf
+Client disconnected: 6zbEVz5ogZtixoIZAAAf
+Client connected: 3lsh4RMRF3PI1QmDAAAh
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Air quality: AQI 43 (Moderate), PM10 30.9, PM2.5 28.9
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: 3lsh4RMRF3PI1QmDAAAh
+Client connected: kqIQsOdi32kyVEIcAAAj
+Client disconnected: kqIQsOdi32kyVEIcAAAj
+Client connected: ap5J8eAS1pTvZVZiAAAl
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 43 (Moderate), PM10 30.9, PM2.5 28.9
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: ap5J8eAS1pTvZVZiAAAl
+Client connected: CAburad0Ykf9oWBZAAAn
+Client disconnected: CAburad0Ykf9oWBZAAAn
+Client connected: _qPFh7oul_txxWOiAAAp
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Marine: 3 readings saved.
+[ingest] Storm events error: Request failed with status code 503
+[ingest] All datasets processed.
+Client disconnected: _qPFh7oul_txxWOiAAAp
+Client connected: 5UZKaadjReUnaSyoAAAr
+Client disconnected: 5UZKaadjReUnaSyoAAAr
+Client connected: o6ozsY-rKk3gyNMwAAAt
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] Marine: 3 readings saved.
+[ingest] WasteData saved.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Storm events error: Request failed with status code 503
+[ingest] All datasets processed.
+Client disconnected: o6ozsY-rKk3gyNMwAAAt
+Client connected: X5ZIDakEu2LRF5izAAAv
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: X5ZIDakEu2LRF5izAAAv
+Client connected: GD8MDmJ5bh8v41YDAAAx
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: GD8MDmJ5bh8v41YDAAAx
+Client connected: bRhhzrifwE9DT80tAAAz
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Marine: 3 readings saved.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: bRhhzrifwE9DT80tAAAz
+Client connected: 2aoPryAKBJHXdnqLAAA1
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: 2aoPryAKBJHXdnqLAAA1
+Client connected: ehWinvFAUG169OxGAAA3
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] Air quality error: timeout of 10000ms exceeded
+[ingest] Weather/Waste error: timeout of 12000ms exceeded
+[ingest] Marine: 0 readings saved.
+[ingest] Storm events error: timeout of 12000ms exceeded
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] Marine: 3 readings saved.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Air quality: AQI 39 (Fair), PM10 29.6, PM2.5 27.9
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: ehWinvFAUG169OxGAAA3
+[ingest] Full data ingestion starting…
+[ingest] Weather/Waste error: getaddrinfo ENOTFOUND api.open-meteo.com
+[ingest] Marine: 0 readings saved.
+[ingest] Air quality error: getaddrinfo ENOTFOUND air-quality-api.open-meteo.com
+[ingest] Storm events error: getaddrinfo ENOTFOUND eonet.gsfc.nasa.gov
+Client disconnected: 6Qqpelnlm01ucwOiAAAd
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] All datasets processed.
+Client connected: SJRGGprlZ0i4W-E_AAA5
+Client connected: zYxmfpVu9G6OX6ScAAA7
+Client disconnected: SJRGGprlZ0i4W-E_AAA5
+Client disconnected: zYxmfpVu9G6OX6ScAAA7
+[ingest] Full data ingestion starting…
+[ingest] Weather/Waste error: getaddrinfo ENOTFOUND api.open-meteo.com
+[ingest] Marine: 0 readings saved.
+[ingest] Air quality error: getaddrinfo ENOTFOUND air-quality-api.open-meteo.com
+[ingest] Storm events error: getaddrinfo ENOTFOUND eonet.gsfc.nasa.gov
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] All datasets processed.
+Client connected: KB6D_2_ff878bvWvAAA9
+Client connected: KGX_RTFyh1oUs84pAAA_
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 28.1, PM2.5 26.6
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 28.1, PM2.5 26.6
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 28.1, PM2.5 26.6
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 28.1, PM2.5 26.6
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 28.1, PM2.5 26.6
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] WasteData saved.
+[ingest] Marine: 3 readings saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: KB6D_2_ff878bvWvAAA9
+Client connected: 5vWpeJjvhkUL1q2sAABB
+Client disconnected: 5vWpeJjvhkUL1q2sAABB
+Client connected: l9Q60Or1pyoxi94kAABD
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: l9Q60Or1pyoxi94kAABD
+Client connected: skHKmPIDQjgS2r7vAABF
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] Marine: 3 readings saved.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: skHKmPIDQjgS2r7vAABF
+Client connected: dHMzHr8nSfXsMllIAABH
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+[ingest] WasteData saved.
+[ingest] Waste reports saved: 5
+[ingest] Operation unchanged, skipped.
+[ingest] Marine: 3 readings saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: KGX_RTFyh1oUs84pAAA_
+Client disconnected: dHMzHr8nSfXsMllIAABH
+[ingest] Full data ingestion starting…
+[ingest] Tidal predictions saved for 3 stations.
+Client connected: ibY1Ng-tn2xdSFd7AABJ
+Client connected: kdTp0i4N9Hemc5PTAABL
+[ingest] WasteData saved.
+[ingest] Air quality: AQI 38 (Fair), PM10 27.5, PM2.5 26.3
+[ingest] Waste reports saved: 5
+[ingest] Operation saved.
+[ingest] Marine: 3 readings saved.
+[ingest] Storms: 0 new of 7 storm events saved.
+[ingest] All datasets processed.
+Client disconnected: kdTp0i4N9Hemc5PTAABL

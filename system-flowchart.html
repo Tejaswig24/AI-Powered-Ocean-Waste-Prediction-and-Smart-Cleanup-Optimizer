@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OceanGuard AI — System Flowchart</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 30px 60px;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a2540;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .sub {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 36px;
+  }
+
+  /* ── FLOW WRAPPER ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  /* ── BOX ── */
+  .box {
+    border-radius: 8px;
+    padding: 11px 22px;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid;
+    line-height: 1.5;
+    min-width: 220px;
+    max-width: 420px;
+  }
+  .box small {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    margin-top: 2px;
+    opacity: 0.78;
+  }
+
+  /* Box colours */
+  .b-start  { background:#1a2540; border-color:#1a2540; color:#fff; border-radius:50px; }
+  .b-api    { background:#eef2ff; border-color:#6366f1; color:#3730a3; }
+  .b-proc   { background:#eff6ff; border-color:#3b82f6; color:#1d4ed8; }
+  .b-db     { background:#f0fdf4; border-color:#22c55e; color:#15803d; border-radius:4px; }
+  .b-sock   { background:#fffbeb; border-color:#f59e0b; color:#b45309; }
+  .b-ui     { background:#fdf4ff; border-color:#a855f7; color:#7e22ce; }
+  .b-alert  { background:#fff1f2; border-color:#ef4444; color:#b91c1c; }
+  .b-end    { background:#1a2540; border-color:#1a2540; color:#fff; border-radius:50px; }
+
+  /* ── ARROW ── */
+  .arr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+  }
+  .arr-line {
+    width: 2px;
+    height: 22px;
+    background: #b0bec5;
+  }
+  .arr-head {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #b0bec5;
+  }
+  .arr-label {
+    font-size: 9.5px;
+    color: #888;
+    margin-bottom: 2px;
+    font-style: italic;
+  }
+
+  /* ── PARALLEL BLOCK ── */
+  .parallel {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    width: 100%;
+    justify-content: center;
+  }
+  .par-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .par-box {
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid;
+    min-width: 130px;
+    max-width: 160px;
+    line-height: 1.4;
+  }
+  .par-box small { display:block; font-size:9px; font-weight:400; opacity:0.75; margin-top:2px; }
+
+  /* ── H-BRACKET (fork / join) ── */
+  .fork {
+    display: flex;
+    width: 100%;
+    max-width: 700px;
+    height: 18px;
+    position: relative;
+    justify-content: center;
+  }
+  .fork-line {
+    position: absolute;
+    top: 0;
+    height: 2px;
+    background: #b0bec5;
+  }
+  .fork-drop {
+    position: absolute;
+    bottom: 0;
+    width: 2px;
+    background: #b0bec5;
+  }
+
+  /* ── DECISION DIAMOND ── */
+  .diamond-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  .diamond {
+    width: 90px;
+    height: 90px;
+    background: #fff8e1;
+    border: 2px solid #f59e0b;
+    transform: rotate(45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+  }
+  .diamond-text {
+    transform: rotate(-45deg);
+    font-size: 11px;
+    font-weight: 700;
+    color: #b45309;
+    text-align: center;
+    line-height: 1.3;
+    width: 110px;
+  }
+  .d-label {
+    font-size: 10px;
+    color: #888;
+    font-style: italic;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    border-top: 1px dashed #e2e8f0;
+    width: 100%;
+    max-width: 700px;
+    padding-top: 14px;
+    margin-top: 6px;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    margin-top: 40px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 18px;
+    max-width: 700px;
+    width: 100%;
+    justify-content: center;
+  }
+  .leg { display:flex; align-items:center; gap:6px; font-size:10px; color:#555; }
+  .leg-dot { width:12px; height:12px; border-radius:3px; border:2px solid; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<h1>OceanGuard AI — System Flow</h1>
+<p class="sub">Ocean Waste Optimizer · End-to-End Architecture</p>
+
+<div class="flow">
+
+  <!-- START -->
+  <div class="box b-start">START — System Boot</div>
+
+  <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <!-- TRIGGER -->
+  <div class="box b-proc">
+    Scheduler Trigger
+    <small>setInterval · every 5 minutes · ingestAllData()</small>
+  </div>
+
+  <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <!-- SECTION: APIs -->
+  <div class="section-title">External API Calls (Parallel)</div>
+
+  <!-- parallel APIs -->
+  <div class="parallel">
+    <div class="par-col">
+      <div class="par-box b-api">🌤 Open-Meteo Weather<small>Wind · Rain · Visibility</small></div>
+    </div>
+    <div class="par-col">
+      <div class="par-box b-api">🌊 Open-Meteo Marine<small>Waves · Swell · Current</small></div>
+    </div>
+    <div class="par-col">
+      <div class="par-box b-api">💨 Air Quality API<small>PM10 · PM2.5 · AQI</small></div>
+    </div>
+    <div class="par-col">
+      <div class="par-box b-api">🛰 NASA EONET<small>Active Storms</small></div>
+    </div>
+    <div class="par-col">
+      <div class="par-box b-api">🌑 Tidal Model<small>M2·S2·K1·O1 harmonics</small></div>
+    </div>
+  </div>
+
+  <div class="arr" style="margin-top:6px"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <!-- SECTION: Processing -->
+  <div class="section-title">Backend Processing</div>
+
+  <div class="box b-proc">
+    Build Prediction Payload
+    <small>buildPredictions() · 5 Tamil Nadu zones · riskLevel · tonnage · trajectory</small>
+  </div>
+
+  <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <div class="box b-proc">
+    Build Operation Payload
+    <small>Vessels · Teams · Routes · Equipment · Summary</small>
+  </div>
+
+  <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <div class="box b-proc">
+    Generate Waste Reports
+    <small>Crowdsource · Drone · Vessel · Satellite sightings</small>
+  </div>
+
+  <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <!-- DEDUP DECISION -->
+  <div class="section-title">Deduplication Check</div>
+
+  <div class="diamond-wrap">
+    <div class="diamond">
+      <div class="diamond-text">Data Changed or Stale &gt; 30 min?</div>
+    </div>
+  </div>
+
+  <!-- YES / NO fork -->
+  <div style="display:flex;gap:80px;align-items:flex-start;margin-top:4px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+      <span class="d-label">YES — Save</span>
+      <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+      <div class="par-box b-db" style="min-width:140px">MongoDB Save<small>WasteData · Operation<br>MarineReading · AirQuality<br>StormEvent · TidalPrediction<br>WasteReport</small></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+      <span class="d-label">NO — Skip</span>
+      <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+      <div class="par-box" style="min-width:140px;background:#f8fafc;border:2px dashed #94a3b8;color:#64748b;font-size:11px;font-weight:600;text-align:center;padding:9px 14px;border-radius:8px">Skip Save<small>No DB write<br>Wait for next cycle</small></div>
+    </div>
+  </div>
+
+  <div class="arr" style="margin-top:10px"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <!-- SOCKET -->
+  <div class="section-title">Real-time Push</div>
+
+  <div class="box b-sock">
+    Socket.IO Broadcast
+    <small>waste-data-update · operation-update · marine-data-update · air-quality-update · storms-update · tidal-update · waste-reports-update</small>
+  </div>
+
+  <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <!-- FRONTEND -->
+  <div class="section-title">Frontend (Browser)</div>
+
+  <div class="parallel">
+    <div class="par-col">
+      <div class="par-box b-ui">📊 Dashboard<small>Stats · Live Map<br>Alerts · Chart</small></div>
+    </div>
+    <div class="par-col">
+      <div class="par-box b-ui">🎯 Drift Prediction<small>Risk zones<br>Trajectory</small></div>
+    </div>
+    <div class="par-col">
+      <div class="par-box b-ui">🗺 Route Map<small>Cleanup lanes<br>Vessels</small></div>
+    </div>
+    <div class="par-col">
+      <div class="par-box b-ui">⚙ Operations<small>Teams · Vessels<br>Equipment</small></div>
+    </div>
+    <div class="par-col">
+      <div class="par-box b-ui">🤖 AI Model<small>Accuracy<br>Features</small></div>
+    </div>
+  </div>
+
+  <div class="arr" style="margin-top:6px"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <!-- ALERT -->
+  <div class="box b-alert">
+    Alert System
+    <small>Wave &gt; 2m · AQI &gt; 60 · Storm detected · High tide · Waste volume threshold · 10-min dedup cooldown</small>
+  </div>
+
+  <div class="arr"><div class="arr-line"></div><div class="arr-head"></div></div>
+
+  <!-- END -->
+  <div class="box b-end">Wait for Next 5-min Cycle</div>
+
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#eef2ff;border-color:#6366f1"></div>External API</div>
+  <div class="leg"><div class="leg-dot" style="background:#eff6ff;border-color:#3b82f6"></div>Backend Process</div>
+  <div class="leg"><div class="leg-dot" style="background:#f0fdf4;border-color:#22c55e"></div>MongoDB</div>
+  <div class="leg"><div class="leg-dot" style="background:#fffbeb;border-color:#f59e0b"></div>Socket.IO Event</div>
+  <div class="leg"><div class="leg-dot" style="background:#fdf4ff;border-color:#a855f7"></div>Frontend View</div>
+  <div class="leg"><div class="leg-dot" style="background:#fff1f2;border-color:#ef4444"></div>Alert System</div>
+  <div class="leg"><div class="leg-dot" style="background:#fff8e1;border-color:#f59e0b"></div>Decision / Logic</div>
+</div>
+
+</body>
+</html>
